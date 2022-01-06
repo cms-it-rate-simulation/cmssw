@@ -23,7 +23,6 @@
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/stream/EDProducer.h"
-
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 
@@ -37,6 +36,19 @@
 
 #include "DataFormats/Common/interface/DetSetVector.h"
 #include "DataFormats/DetId/interface/DetId.h"
+
+#include "DataFormats/Phase2TrackerDigi/interface/Hit.h"
+#include "DataFormats/Phase2TrackerDigi/interface/QCore.h"
+#include "DataFormats/Phase2TrackerDigi/interface/ReadoutChip.h"
+
+#include "DataFormats/SiPixelDetId/interface/PixelSubdetector.h"
+
+#include "DataFormats/TrackerCommon/interface/TrackerTopology.h"
+
+#include "DataFormats/SiPixelCluster/interface/SiPixelCluster.h"
+
+#include "TrackingTools/Records/interface/TransientTrackRecord.h"
+
 
 //
 // class declaration
@@ -55,6 +67,7 @@ private:
   // ----------member data ---------------------------
   
   edm::InputTag src_;
+  edm::EDGetTokenT<edm::DetSetVector<PixelDigi>> pixelDigi_token_;
   typedef math::XYZPointD Point;
   typedef std::vector<Point> PointCollection;
 };
@@ -77,6 +90,8 @@ PixelQCoreProducer::PixelQCoreProducer(const edm::ParameterSet& iConfig)
   //produces<PointCollection>( "innerPoint" ).setBranchAlias( "innerPoints");
   //produces<PointCollection>( "outerPoint" ).setBranchAlias( "outerPoints");
   //register your products
+  
+  pixelDigi_token_ = consumes<edm::DetSetVector<PixelDigi>>(iConfig.getParameter<edm::InputTag>("siPixelDigi"));
 
   //produces<int>("integer").setBranchAlias( "integer" );
   produces<edm::DetSetVector<int> >();
@@ -104,6 +119,90 @@ PixelQCoreProducer::~PixelQCoreProducer() {
 // member functions
 //
 
+std::vector<Hit> adjustEdges(std::vector<Hit> hitList) {
+        std::vector<Hit> hitListOne = {};
+        std::vector<Hit> hitListTwo = {};
+
+        for(auto hit:hitList) {
+                if(hit.row < 672) {
+                        hitListOne.push_back(hit);
+                } else if(672 <= hit.row && hit.row <= 675) {
+                        hitListOne.push_back(Hit(671, hit.col, hit.adc));
+                } else if(676 <= hit.row && hit.row <= 679) {
+                        hitListOne.push_back(Hit(672, hit.col, hit.adc));
+                } else if(hit.row > 679) {
+                        hitListOne.push_back(Hit(hit.row - 8, hit.col, hit.adc));
+                }
+        }
+
+        for(auto hit:hitListOne) {
+                if(hit.col < 216) {
+                        hitListTwo.push_back(hit);
+                } else if(hit.col == 216) {
+                        hitListTwo.push_back(Hit(hit.row, 215, hit.adc));
+                } else if(hit.col == 217) {
+                        hitListTwo.push_back(Hit(hit.row, 216, hit.adc));
+                } else if(hit.col > 217) {
+                        hitListTwo.push_back(Hit(hit.row, hit.col - 2, hit.adc));
+                }
+        }
+
+        return hitListTwo;
+}
+
+std::vector<ReadoutChip> splitByChip(std::vector<Hit> hitList) {
+        std::vector<Hit> chip1 = {};
+        std::vector<Hit> chip2 = {};
+        std::vector<Hit> chip3 = {};
+        std::vector<Hit> chip4 = {};
+
+        for(auto hit:hitList) {
+                if(hit.row < 672) {
+                        if(hit.col < 216) {
+                                chip1.push_back(hit);
+                        } else {
+                                chip2.push_back(hit);
+                        }
+                } else {
+                        if(hit.col < 216) {
+                                chip3.push_back(hit);
+                        } else {
+                                chip4.push_back(hit);
+                        }
+                }
+        }
+
+        return {ReadoutChip(chip1), ReadoutChip(chip2), ReadoutChip(chip3),ReadoutChip(chip4)};
+}
+
+void processHits(std::vector<Hit> hitList) {
+        std::vector<Hit> newHitList;
+
+        std::cout << "Hits:" << "\n";
+        for(auto& hit:hitList) {
+                std::cout << "row, col : " << hit.row << ", " << hit.col << "\n";
+        }
+
+        newHitList = adjustEdges(hitList);
+
+        std::vector<ReadoutChip> chips = splitByChip(newHitList);
+        std::vector<bool> code;
+
+        for(size_t i = 0; i < chips.size(); i++) {
+                ReadoutChip chip = chips[i];
+                code = chip.get_chip_code();
+
+                std::cout << "number of hits: " << chip.size() << "\n";
+                std::cout << "code length: " << code.size() << "\n";
+                std::cout << "chip code: ";
+                for(size_t j = 0; j < code.size(); j++) {
+                        std::cout << code[j];
+                }
+                std::cout << "\n";
+        }
+        std::cout << "\n";
+}
+
 // ------------ method called to produce the data  ------------
 void PixelQCoreProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   using namespace edm; 
@@ -114,6 +213,8 @@ void PixelQCoreProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
   //iEvent.getByLabel( src_, tracks );
   // create the vectors. Use auto_ptr, as these pointers will automatically
   // delete when they go out of scope, a very efficient way to reduce memory leaks.
+  
+  /*
   unique_ptr<edm::DetSetVector<int> > aIntVector = make_unique<edm::DetSetVector<int> >();
   const DetSet<int> one(1);
   const DetSet<int> three(3);
@@ -123,43 +224,57 @@ void PixelQCoreProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
   aIntVector->insert(three);
   aIntVector->insert(seven);
 
-  //auto_ptr<PointCollection> outerPoints( new PointCollection );
-  // and already reserve some space for the new data, to control the size
-  // of your executible's memory use.
-
-  //const int size = tracks->size();
-  //innerPoints->reserve( size );
-  //outerPoints->reserve( size );
-  // loop over the tracks:
-  //for( TrackCollection::const_iterator track = tracks->begin(); 
-  //     track != tracks->end(); ++ track ) {
-    // fill the points in the vectors
-  //  innerPoints->push_back( track->innerPosition() );
-  //  outerPoints->push_back( track->outerPosition() );
-  //}
-  // and save the vectors
-
-
   std::cout << "WILL STORE INT DETSETVECTOR IN EVENT" <<std::endl;
 
   iEvent.put( std::move(aIntVector) );
-  //iEvent.put( std::move(aInteger), "integer" );
+  */
 
-  //iEvent.put( outerPoints, "outerPoint" );
-   
-/* This is an event example
-  //Read 'ExampleData' from the Event
-  ExampleData const& in = iEvent.get(inToken_);
+  //Retrieve tracker topology from geometry
+  edm::ESHandle<TrackerTopology> tTopoHandle;
+  iSetup.get<TrackerTopologyRcd>().get(tTopoHandle);
+  const TrackerTopology* const tTopo = tTopoHandle.product();
 
-  //Use the ExampleData to create an ExampleData2 which 
-  // is put into the Event
-  iEvent.put(std::make_unique<ExampleData2>(in));
-*/
 
-/* this is an EventSetup example
-  //Read SetupData from the SetupRecord in the EventSetup
-  SetupData& setup = iSetup.getData(setupToken_);
-*/
+  edm::Handle<edm::DetSetVector<PixelDigi> > pixelDigiHandle;
+  iEvent.getByToken(pixelDigi_token_, pixelDigiHandle);
+
+  edm::DetSetVector<PixelDigi>::const_iterator iterDet;
+  for ( iterDet = pixelDigiHandle->begin();
+        iterDet != pixelDigiHandle->end();
+        iterDet++ ) {
+
+    DetId tkId = iterDet->id;
+
+    edm::DetSet<PixelDigi> theDigis = (*pixelDigiHandle)[ tkId ];
+
+    std::vector<Hit> hitlist;
+
+    std::vector<int> id;
+
+    if (tkId.subdetId() == PixelSubdetector::PixelBarrel) {
+        int layer_num = tTopo->pxbLayer(tkId.rawId());
+        int ladder_num = tTopo->pxbLadder(tkId.rawId());
+        int module_num = tTopo->pxbModule(tkId.rawId());
+        id = {tkId.subdetId(), layer_num, ladder_num, module_num};
+        cout << "tkID: "<<tkId.subdetId()<<" Layer="<<layer_num<<" Ladder="<<ladder_num<<" Module="<<module_num<<endl;
+    } else if (tkId.subdetId() == PixelSubdetector::PixelEndcap) {
+        int module_num = tTopo->pxfModule(tkId());
+        int disk_num = tTopo->pxfDisk(tkId());
+        int blade_num = tTopo->pxfBlade(tkId());
+        int panel_num = tTopo->pxfPanel(tkId());
+        int side_num = tTopo->pxfSide(tkId());
+        id = {tkId.subdetId(), module_num, disk_num, blade_num, panel_num, side_num};
+        cout << "tkID: "<<tkId.subdetId()<<" Module="<<module_num<<" Disk="<<disk_num<<" Blade="<<blade_num<<" Panel="<<panel_num<<" Side="<<side_num<<endl;
+    }
+
+    for ( auto iterDigi = theDigis.begin();
+          iterDigi != theDigis.end();
+          ++iterDigi ) {
+      hitlist.emplace_back(Hit(iterDigi->row(),iterDigi->column(),iterDigi->adc()));
+    }
+
+    processHits(hitlist);
+  }
 }
 
 // ------------ method called once each stream before processing any runs, lumis or events  ------------
