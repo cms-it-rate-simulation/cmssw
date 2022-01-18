@@ -12,6 +12,7 @@
 #include "DataFormats/TrackerCommon/interface/TrackerTopology.h"
 #include "DataFormats/SiPixelDetId/interface/PixelSubdetector.h"
 #include "DataFormats/SiPixelCluster/interface/SiPixelCluster.h"
+#include "DataFormats/Phase2TrackerDigi/interface/QCore.h"
 
 #include "DataFormats/TrackReco/interface/Track.h"
 
@@ -129,7 +130,7 @@ private:
   edm::ParameterSet const conf_;
   TrackerHitAssociator::Config trackerHitAssociatorConfig_;
   edm::EDGetTokenT<edmNew::DetSetVector<SiPixelRecHit>> pixelRecHits_token_;
-  edm::EDGetTokenT<edm::DetSetVector<int> > int_token_;
+  edm::EDGetTokenT<edm::DetSetVector<QCore> > qcore_token_;
   edm::EDGetTokenT<edm::DetSetVector<PixelDigi>> pixelDigi_token_;
   std::string ttrhBuilder_;
   edm::EDGetTokenT<edm::View<reco::Track>> recoTracks_token_;
@@ -207,7 +208,7 @@ private:
 Phase2PixelRawNtuple::Phase2PixelRawNtuple(edm::ParameterSet const& conf)
     : trackerHitAssociatorConfig_(conf, consumesCollector()),
       pixelRecHits_token_(consumes<edmNew::DetSetVector<SiPixelRecHit>>(edm::InputTag("siPixelRecHits"))),
-      int_token_(consumes<edm::DetSetVector<int> >(edm::InputTag("PixelQCore"))),
+      qcore_token_(consumes<edm::DetSetVector<QCore> >(edm::InputTag("PixelQCore"))),
       pixelDigi_token_(consumes<edm::DetSetVector<PixelDigi>>(conf.getParameter<edm::InputTag>("siPixelDigi"))),
       ttrhBuilder_(conf.getParameter<std::string>("ttrhBuilder")),  //ttrhBuilder_token def
       recoTracks_token_(consumes<edm::View<reco::Track>>(conf.getParameter<edm::InputTag>("trackProducer"))),
@@ -362,12 +363,28 @@ void Phase2PixelRawNtuple::analyze(const edm::Event& e, const edm::EventSetup& e
   edm::Handle<SiPixelRecHitCollection> recHitColl;
   e.getByToken(pixelRecHits_token_, recHitColl);
 
-  edm::Handle<edm::DetSetVector<int> > aIntVector;
-  e.getByToken(int_token_, aIntVector);
+  edm::Handle<edm::DetSetVector<QCore> > aQCoreVector;
+  e.getByToken(qcore_token_, aQCoreVector);
 
-  std::vector<unsigned int> vect;
-  aIntVector->getIds(vect);
-  std::cout << "RETRIEVED DETSETVECTOR INT : "<<vect.size()<< std::endl;
+  std::cout << "RETRIEVED DETSETVECTOR QCORE : " << std::endl;
+
+  edm::DetSetVector<QCore>::const_iterator iterDet;
+  for ( iterDet = aQCoreVector->begin();
+        iterDet != aQCoreVector->end();
+        iterDet++ ) {
+
+    DetId tkId = iterDet->id;
+
+    edm::DetSet<QCore> theQCores = (*aQCoreVector)[ tkId ];
+
+    std::cout << "QCORE DETID : " << tkId.rawId() << std::endl;
+
+    for ( auto iterQCore = theQCores.begin();
+          iterQCore != theQCores.end();
+          ++iterQCore ) {
+      std::cout << "QCORE : " << iterQCore->get_rocid() << " " << iterQCore->get_col() << " " << iterQCore->get_row() << std::endl;
+    }
+  }
 
   // for finding matched simhit
   TrackerHitAssociator associate(e, trackerHitAssociatorConfig_);
@@ -386,6 +403,8 @@ void Phase2PixelRawNtuple::analyze(const edm::Event& e, const edm::EventSetup& e
 
   edm::Handle<edm::DetSetVector<PixelDigi> > pixelDigiHandle;
   e.getByToken(pixelDigi_token_, pixelDigiHandle);
+
+  /*
 
   edm::DetSetVector<PixelDigi>::const_iterator iterDet;
   for ( iterDet = pixelDigiHandle->begin();
@@ -424,6 +443,7 @@ void Phase2PixelRawNtuple::analyze(const edm::Event& e, const edm::EventSetup& e
 
   }
 
+  */
 
   if ((recHitColl.product())->dataSize() > 0) {
     std::string detname;

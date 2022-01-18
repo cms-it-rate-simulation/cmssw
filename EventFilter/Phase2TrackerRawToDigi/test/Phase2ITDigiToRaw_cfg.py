@@ -53,7 +53,8 @@ process.load("Validation.RecoVertex.mcverticesanalyzer_cfi")
 process.mcverticesanalyzer.pileupSummaryCollection = cms.InputTag("addPileupInfo","","HLT")
 
 process.PixelQCore = cms.EDProducer('PixelQCoreProducer'
-        ,src    =cms.InputTag('generalTracks')
+                                    ,src    =cms.InputTag('generalTracks')
+                                    ,siPixelDigi = cms.InputTag("simSiPixelDigis", "Pixel")
                             )
 
 

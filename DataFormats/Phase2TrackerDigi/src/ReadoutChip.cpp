@@ -1,12 +1,14 @@
 #include <vector>
 #include <utility>
 #include <string>
+#include <iostream>
 #include "../interface/QCore.h"
 #include "../interface/ReadoutChip.h"
 #include "../interface/Hit.h"
 
-ReadoutChip::ReadoutChip(std::vector<Hit> hl) {
-	hitList = hl;
+ReadoutChip::ReadoutChip(int rocnum, std::vector<Hit> hl) {
+  hitList = hl;
+  rocnum_ = rocnum; 
 }
 
 //Returns the total number of hits on the readout chip
@@ -39,7 +41,7 @@ QCore ReadoutChip::get_QCore_from_hit(Hit pixel) {
                 }
         }
 
-        QCore qcore(pos.second, pos.first, false, false, adcs);
+        QCore qcore(0,pos.second, pos.first, false, false, adcs);
 
         return qcore;
 }
@@ -86,24 +88,38 @@ std::vector<QCore> ReadoutChip::organize_QCores(std::vector<QCore> qcores) {
 
 //Takes in an oranized list of qcores and sets the islast and isneighbor properties of those qcores
 std::vector<QCore> link_QCores(std::vector<QCore> qcores) {
+  std::cout << "In link_QCores size " << qcores.size() << std::endl;
 	for(size_t i = 1; i < qcores.size(); i++) {
 		if(qcores[i].get_row() == qcores[i - 1].get_row()) {
 			qcores[i].isneighbour = true;
 		}
 	}
 
-	for(size_t i = 0; i < qcores.size() - 1; i++) {
-		if(qcores[i].get_col() != qcores[i + 1].get_col()) {
-			qcores[i].islast = true;
-		}
+	std::cout << "Here001" << std::endl;
+
+	if (qcores.size()>0) {
+
+	  //size is unsigned so if size is zero size()-1 is a huge number...
+	  //Hence this needs to be procted
+	  for(size_t i = 0; i < qcores.size() - 1; i++) {
+	    if(qcores[i].get_col() != qcores[i + 1].get_col()) {
+	      qcores[i].islast = true;
+	    }
+	  }
+	  
+	  std::cout << "Here002" << std::endl;
+	  
+	  qcores[qcores.size() - 1].islast = true;
 	}
-	qcores[qcores.size() - 1].islast = true;
+
+	std::cout << "Here003" << std::endl;
 
 	return qcores;
 }
 
 //Takes in list of hits and organizes them into the 4x4 QCores that contains them
 std::vector<QCore> ReadoutChip::get_organized_QCores() {
+  std::cout << "In get_organized_QCores" <<std::endl;
         std::vector<QCore> qcores = {};
 
         for(const auto& hit:hitList) {

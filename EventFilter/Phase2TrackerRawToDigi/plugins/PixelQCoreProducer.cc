@@ -94,8 +94,8 @@ PixelQCoreProducer::PixelQCoreProducer(const edm::ParameterSet& iConfig)
   
   pixelDigi_token_ = consumes<edm::DetSetVector<PixelDigi>>(iConfig.getParameter<edm::InputTag>("siPixelDigi"));
 
-  //produces<int>("integer").setBranchAlias( "integer" );
-  produces<edm::DetSetVector<int> >();
+  //produces<int>("qcores").setBranchAlias( "qcores" );
+  produces<edm::DetSetVector<QCore> >();
 
 /* Examples
   produces<ExampleData2>();
@@ -173,10 +173,10 @@ std::vector<ReadoutChip> splitByChip(std::vector<Hit> hitList) {
                 }
         }
 
-        return {ReadoutChip(chip1), ReadoutChip(chip2), ReadoutChip(chip3),ReadoutChip(chip4)};
+        return {ReadoutChip(0,chip1), ReadoutChip(1, chip2), ReadoutChip(2, chip3),ReadoutChip(3, chip4)};
 }
 
-void processHits(std::vector<Hit> hitList) {
+std::vector<ReadoutChip> processHits(std::vector<Hit> hitList) {
         std::vector<Hit> newHitList;
 
         std::cout << "Hits:" << "\n";
@@ -202,6 +202,7 @@ void processHits(std::vector<Hit> hitList) {
                 std::cout << "\n";
         }
         std::cout << "\n";
+	return chips;
 }
 
 // ------------ method called to produce the data  ------------
@@ -215,20 +216,8 @@ void PixelQCoreProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
   // create the vectors. Use auto_ptr, as these pointers will automatically
   // delete when they go out of scope, a very efficient way to reduce memory leaks.
   
-  /*
-  unique_ptr<edm::DetSetVector<int> > aIntVector = make_unique<edm::DetSetVector<int> >();
-  const DetSet<int> one(1);
-  const DetSet<int> three(3);
-  const DetSet<int> seven(7);
+  unique_ptr<edm::DetSetVector<QCore> > aQCoreVector = make_unique<edm::DetSetVector<QCore> >();
 
-  aIntVector->insert(one);
-  aIntVector->insert(three);
-  aIntVector->insert(seven);
-
-  std::cout << "WILL STORE INT DETSETVECTOR IN EVENT" <<std::endl;
-
-  iEvent.put( std::move(aIntVector) );
-  */
 
   //Retrieve tracker topology from geometry
   edm::ESHandle<TrackerTopology> tTopoHandle;
@@ -247,6 +236,10 @@ void PixelQCoreProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
     DetId tkId = iterDet->id;
 
     edm::DetSet<PixelDigi> theDigis = (*pixelDigiHandle)[ tkId ];
+
+
+
+    //break;
 
     std::vector<Hit> hitlist;
 
@@ -274,8 +267,41 @@ void PixelQCoreProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
       hitlist.emplace_back(Hit(iterDigi->row(),iterDigi->column(),iterDigi->adc()));
     }
 
-    processHits(hitlist);
+    std::vector<ReadoutChip> chips = processHits(hitlist);
+
+    std::cout << "Make DetSet" << std::endl;
+
+    DetSet<QCore> DetSetQCores(tkId);
+
+    for(size_t i = 0; i < chips.size(); i++) {
+
+      std::cout << "Retrieve chip " << i << std::endl;
+
+      ReadoutChip chip = chips[i];
+
+      std::cout << "Got chip " << i << std::endl;
+      
+      std::vector<QCore> qcores = chip.get_organized_QCores();
+
+      std::cout << "Got qcores " << std::endl;
+      
+      for (auto& qcore:qcores) {
+	std::cout << "push qcore" << std::endl;
+	DetSetQCores.push_back(qcore);
+      }
+      std::cout << "Done processing chip" << std::endl;
+    }  
+    std::cout << "Add DetSetQCores to DetSetVector" << std::endl;
+    aQCoreVector->insert(DetSetQCores);
+    std::cout << "Donee adding DetSetQCores to DetSetVector" << std::endl;
   }
+
+  std::cout << "WILL STORE QCORE DETSETVECTOR IN EVENT" <<std::endl;
+    
+  iEvent.put( std::move(aQCoreVector) );
+
+  std::cout << "DONE STORE QCORE DETSETVECTOR IN EVENT" <<std::endl;
+  
 }
 
 // ------------ method called once each stream before processing any runs, lumis or events  ------------

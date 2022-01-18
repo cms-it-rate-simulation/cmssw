@@ -19,12 +19,13 @@
     {
     };*/
 
-QCore::QCore(int ccol_in, int qcrow_in, bool isneighbour_in, bool islast_in, std::vector<int> adcs_in) {
-	ccol = ccol_in;
-	qcrow = qcrow_in;
-	isneighbour = isneighbour_in;
-	islast = islast_in;
-	adcs = adcs_in;
+QCore::QCore(int rocid, int ccol_in, int qcrow_in, bool isneighbour_in, bool islast_in, std::vector<int> adcs_in) {
+  rocid_ = rocid;
+  ccol = ccol_in;
+  qcrow = qcrow_in;
+  isneighbour = isneighbour_in;
+  islast = islast_in;
+  adcs = adcs_in;
 }
 
 //Returns the row number of the region

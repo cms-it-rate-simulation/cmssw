@@ -9,11 +9,16 @@
 
 class ReadoutChip {
 	std::vector<Hit> hitList;
+	int rocnum_;
 
 public:
-	ReadoutChip(std::vector<Hit> hl);
+	ReadoutChip(int rocnum, std::vector<Hit> hl);
 
 	int size();
+
+	int rocnum() const {
+	  return rocnum_;
+	}
 
 	std::vector<QCore> get_organized_QCores();
 
