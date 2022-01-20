@@ -3,24 +3,24 @@
 
 class Hit {
 	private:
-		int row;
-		int col;
-		int adc;
+		int row_;
+		int col_;
+		int adc_;
 
 	public:
 		Hit(int row_num, int col_num, int adc_num);
 
 		int row() const {
-			return row;
-		};
+			return row_;
+		}
 
 		int col() const {
-			return col;
-		};
+			return col_;
+		}
 
 		int adc() const {
-			return adc;
-		};
+			return adc_;
+		}
 };
 
 #endif
