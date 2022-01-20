@@ -11,7 +11,7 @@ ReadoutChip::ReadoutChip(int rocnum, std::vector<Hit> hl) {
   rocnum_ = rocnum; 
 }
 
-//Returns the number of hits on the readout chip
+//Returns the total number of hits on the readout chip
 int ReadoutChip::size() {
 	return hitList.size();
 }
