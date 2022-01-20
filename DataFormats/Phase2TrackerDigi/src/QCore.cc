@@ -28,16 +28,6 @@ QCore::QCore(int rocid, int ccol_in, int qcrow_in, bool isneighbour_in, bool isl
   adcs = adcs_in;
 }
 
-//Returns the row number of the region
-int QCore::get_row() {
-	return qcrow;
-}
-
-//Returns the column number of the region
-int QCore::get_col() {
-	return ccol;
-}
-
 //Takes in a hitmap in sensor corrdinates with 4x4 regions and converts it to readout chip coordinates with 2x8 regions
 std::vector<bool> QCore::to_ROC_coordinates(std::vector<bool> hitmap) {
 	std::vector<bool> ROC_hitmap(16, 0);

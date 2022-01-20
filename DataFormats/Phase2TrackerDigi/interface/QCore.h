@@ -33,9 +33,15 @@ class QCore{
     return rocid_;
   }
   
-  int get_col();
+  //Returns the column number of the QCore
+  int get_col() const {
+    return ccol;
+  }
   
-  int get_row();
+  //Returns the row number of the QCore
+  int get_row() const {
+    return qcrow;
+  }
   
   std::vector<bool> to_ROC_coordinates(std::vector<bool> hitmap);
   
