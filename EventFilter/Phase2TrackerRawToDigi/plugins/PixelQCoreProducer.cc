@@ -127,26 +127,26 @@ std::vector<Hit> adjustEdges(std::vector<Hit> hitList) {
         std::vector<Hit> hitListTwo = {};
 
         for(auto hit:hitList) {
-                if(hit.row < 672) {
+                if(hit.row() < 672) {
                         hitListOne.push_back(hit);
-                } else if(672 <= hit.row && hit.row <= 675) {
-                        hitListOne.push_back(Hit(671, hit.col, hit.adc));
-                } else if(676 <= hit.row && hit.row <= 679) {
-                        hitListOne.push_back(Hit(672, hit.col, hit.adc));
-                } else if(hit.row > 679) {
-                        hitListOne.push_back(Hit(hit.row - 8, hit.col, hit.adc));
+                } else if(672 <= hit.row() && hit.row() <= 675) {
+                        hitListOne.push_back(Hit(671, hit.col(), hit.adc()));
+                } else if(676 <= hit.row() && hit.row() <= 679) {
+                        hitListOne.push_back(Hit(672, hit.col(), hit.adc()));
+                } else if(hit.row() > 679) {
+                        hitListOne.push_back(Hit(hit.row() - 8, hit.col(), hit.adc()));
                 }
         }
 
         for(auto hit:hitListOne) {
-                if(hit.col < 216) {
+                if(hit.col() < 216) {
                         hitListTwo.push_back(hit);
-                } else if(hit.col == 216) {
-                        hitListTwo.push_back(Hit(hit.row, 215, hit.adc));
-                } else if(hit.col == 217) {
-                        hitListTwo.push_back(Hit(hit.row, 216, hit.adc));
-                } else if(hit.col > 217) {
-                        hitListTwo.push_back(Hit(hit.row, hit.col - 2, hit.adc));
+                } else if(hit.col() == 216) {
+                        hitListTwo.push_back(Hit(hit.row(), 215, hit.adc()));
+                } else if(hit.col() == 217) {
+                        hitListTwo.push_back(Hit(hit.row(), 216, hit.adc()));
+                } else if(hit.col() > 217) {
+                        hitListTwo.push_back(Hit(hit.row(), hit.col() - 2, hit.adc()));
                 }
         }
 
@@ -160,14 +160,14 @@ std::vector<ReadoutChip> splitByChip(std::vector<Hit> hitList) {
         std::vector<Hit> chip4 = {};
 
         for(auto hit:hitList) {
-                if(hit.row < 672) {
-                        if(hit.col < 216) {
+                if(hit.row() < 672) {
+                        if(hit.col() < 216) {
                                 chip1.push_back(hit);
                         } else {
                                 chip2.push_back(hit);
                         }
                 } else {
-                        if(hit.col < 216) {
+                        if(hit.col() < 216) {
                                 chip3.push_back(hit);
                         } else {
                                 chip4.push_back(hit);
@@ -183,7 +183,7 @@ std::vector<ReadoutChip> processHits(std::vector<Hit> hitList) {
 
         std::cout << "Hits:" << "\n";
         for(auto& hit:hitList) {
-                std::cout << "row, col : " << hit.row << ", " << hit.col << "\n";
+                std::cout << "row, col : " << hit.row() << ", " << hit.col() << "\n";
         }
 
         newHitList = adjustEdges(hitList);
