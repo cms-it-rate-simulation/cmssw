@@ -92,7 +92,7 @@ std::vector<QCore> link_QCores(std::vector<QCore> qcores) {
   std::cout << "In link_QCores size " << qcores.size() << std::endl;
 	for(size_t i = 1; i < qcores.size(); i++) {
 		if(qcores[i].get_row() == qcores[i - 1].get_row()) {
-			qcores[i].isneighbour = true;
+			qcores[i].setIsNeighbour(true);
 		}
 	}
 
@@ -104,13 +104,13 @@ std::vector<QCore> link_QCores(std::vector<QCore> qcores) {
 	  //Hence this needs to be procted
 	  for(size_t i = 0; i < qcores.size() - 1; i++) {
 	    if(qcores[i].get_col() != qcores[i + 1].get_col()) {
-	      qcores[i].islast = true;
+	      qcores[i].setIsLast(true);
 	    }
 	  }
 	  
 	  std::cout << "Here002" << std::endl;
 	  
-	  qcores[qcores.size() - 1].islast = true;
+	  qcores[qcores.size() - 1].setIsLast(true);
 	}
 
 	std::cout << "Here003" << std::endl;
@@ -143,7 +143,7 @@ std::vector<bool> ReadoutChip::get_chip_code() {
                 	std::vector<bool> qcore_code = qcore.encode_qcore(is_new_col);
 			code.insert(code.end(), qcore_code.begin(), qcore_code.end());
 			
-			is_new_col = qcore.islast;
+			is_new_col = qcore.islast();
                 }
         }
 
