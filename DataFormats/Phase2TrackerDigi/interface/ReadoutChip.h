@@ -15,9 +15,7 @@ public:
 	ReadoutChip(int rocnum, std::vector<Hit> hl);
 
 	//Returns the number of hits on the readout chip
-	int size() const {
-	  return hitList.size();
-	}
+	int size();
 
 	int rocnum() const {
 	  return rocnum_;
