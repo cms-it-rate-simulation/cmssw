@@ -13,6 +13,7 @@
 #include "DataFormats/SiPixelDetId/interface/PixelSubdetector.h"
 #include "DataFormats/SiPixelCluster/interface/SiPixelCluster.h"
 #include "DataFormats/Phase2TrackerDigi/interface/QCore.h"
+#include "DataFormats/Phase2TrackerDigi/interface/ROCBitStream.h"
 
 #include "DataFormats/TrackReco/interface/Track.h"
 
@@ -131,6 +132,7 @@ private:
   TrackerHitAssociator::Config trackerHitAssociatorConfig_;
   edm::EDGetTokenT<edmNew::DetSetVector<SiPixelRecHit>> pixelRecHits_token_;
   edm::EDGetTokenT<edm::DetSetVector<QCore> > qcore_token_;
+  edm::EDGetTokenT<edm::DetSetVector<ROCBitStream> > bitstream_token_;
   edm::EDGetTokenT<edm::DetSetVector<PixelDigi>> pixelDigi_token_;
   std::string ttrhBuilder_;
   edm::EDGetTokenT<edm::View<reco::Track>> recoTracks_token_;
@@ -209,6 +211,7 @@ Phase2PixelRawNtuple::Phase2PixelRawNtuple(edm::ParameterSet const& conf)
     : trackerHitAssociatorConfig_(conf, consumesCollector()),
       pixelRecHits_token_(consumes<edmNew::DetSetVector<SiPixelRecHit>>(edm::InputTag("siPixelRecHits"))),
       qcore_token_(consumes<edm::DetSetVector<QCore> >(edm::InputTag("PixelQCore"))),
+      bitstream_token_(consumes<edm::DetSetVector<ROCBitStream> >(edm::InputTag("PixelQCore"))),
       pixelDigi_token_(consumes<edm::DetSetVector<PixelDigi>>(conf.getParameter<edm::InputTag>("siPixelDigi"))),
       ttrhBuilder_(conf.getParameter<std::string>("ttrhBuilder")),  //ttrhBuilder_token def
       recoTracks_token_(consumes<edm::View<reco::Track>>(conf.getParameter<edm::InputTag>("trackProducer"))),
@@ -366,6 +369,9 @@ void Phase2PixelRawNtuple::analyze(const edm::Event& e, const edm::EventSetup& e
   edm::Handle<edm::DetSetVector<QCore> > aQCoreVector;
   e.getByToken(qcore_token_, aQCoreVector);
 
+  edm::Handle<edm::DetSetVector<ROCBitStream> > aBitStreamVector;
+  e.getByToken(bitstream_token_, aBitStreamVector);
+
   std::cout << "RETRIEVED DETSETVECTOR QCORE : " << std::endl;
 
   edm::DetSetVector<QCore>::const_iterator iterDet;
@@ -377,12 +383,30 @@ void Phase2PixelRawNtuple::analyze(const edm::Event& e, const edm::EventSetup& e
 
     edm::DetSet<QCore> theQCores = (*aQCoreVector)[ tkId ];
 
-    std::cout << "QCORE DETID : " << tkId.rawId() << std::endl;
+    std::cout << "QCORE DETID NEW : " << tkId.rawId() << std::endl;
 
     for ( auto iterQCore = theQCores.begin();
           iterQCore != theQCores.end();
           ++iterQCore ) {
       std::cout << "QCORE : " << iterQCore->get_rocid() << " " << iterQCore->get_col() << " " << iterQCore->get_row() << std::endl;
+    }
+  }
+
+  edm::DetSetVector<ROCBitStream>::const_iterator iterDetBitStream;
+  for ( iterDetBitStream = aBitStreamVector->begin();
+        iterDetBitStream != aBitStreamVector->end();
+        iterDetBitStream++ ) {
+
+    DetId tkId = iterDetBitStream->id;
+
+    edm::DetSet<ROCBitStream> theBitStreams = (*aBitStreamVector)[ tkId ];
+
+    std::cout << "BITSTREAM DETID : " << tkId.rawId() << std::endl;
+
+    for ( auto iterBitStream = theBitStreams.begin();
+          iterBitStream != theBitStreams.end();
+          ++iterBitStream ) {
+      std::cout << "BITSTREAM : " << iterBitStream->get_rocid() << " size = " << iterBitStream->get_bitstream().size() << std::endl;
     }
   }
 

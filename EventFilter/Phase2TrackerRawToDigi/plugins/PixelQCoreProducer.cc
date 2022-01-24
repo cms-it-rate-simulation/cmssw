@@ -41,6 +41,7 @@
 #include "DataFormats/Phase2TrackerDigi/interface/Hit.h"
 #include "DataFormats/Phase2TrackerDigi/interface/QCore.h"
 #include "DataFormats/Phase2TrackerDigi/interface/ReadoutChip.h"
+#include "DataFormats/Phase2TrackerDigi/interface/ROCBitStream.h"
 
 #include "DataFormats/SiPixelDetId/interface/PixelSubdetector.h"
 
@@ -96,6 +97,7 @@ PixelQCoreProducer::PixelQCoreProducer(const edm::ParameterSet& iConfig)
 
   //produces<int>("qcores").setBranchAlias( "qcores" );
   produces<edm::DetSetVector<QCore> >();
+  produces<edm::DetSetVector<ROCBitStream> >();
 
 /* Examples
   produces<ExampleData2>();
@@ -217,6 +219,7 @@ void PixelQCoreProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
   // delete when they go out of scope, a very efficient way to reduce memory leaks.
   
   unique_ptr<edm::DetSetVector<QCore> > aQCoreVector = make_unique<edm::DetSetVector<QCore> >();
+  unique_ptr<edm::DetSetVector<ROCBitStream> > aBitStreamVector = make_unique<edm::DetSetVector<ROCBitStream> >();
 
 
   //Retrieve tracker topology from geometry
@@ -272,6 +275,7 @@ void PixelQCoreProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
     std::cout << "Make DetSet" << std::endl;
 
     DetSet<QCore> DetSetQCores(tkId);
+    DetSet<ROCBitStream> DetSetBitStream(tkId);
 
     for(size_t i = 0; i < chips.size(); i++) {
 
@@ -289,8 +293,15 @@ void PixelQCoreProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
 	std::cout << "push qcore" << std::endl;
 	DetSetQCores.push_back(qcore);
       }
+
+      ROCBitStream aROCBitStream(i,chip.get_chip_code());
+
+      DetSetBitStream.push_back(aROCBitStream);
+
       std::cout << "Done processing chip" << std::endl;
     }  
+
+    aBitStreamVector->insert(DetSetBitStream);
     std::cout << "Add DetSetQCores to DetSetVector" << std::endl;
     aQCoreVector->insert(DetSetQCores);
     std::cout << "Donee adding DetSetQCores to DetSetVector" << std::endl;
@@ -299,6 +310,7 @@ void PixelQCoreProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
   std::cout << "WILL STORE QCORE DETSETVECTOR IN EVENT" <<std::endl;
     
   iEvent.put( std::move(aQCoreVector) );
+  iEvent.put( std::move(aBitStreamVector) );
 
   std::cout << "DONE STORE QCORE DETSETVECTOR IN EVENT" <<std::endl;
   
