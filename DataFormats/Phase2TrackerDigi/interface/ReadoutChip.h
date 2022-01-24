@@ -14,7 +14,10 @@ class ReadoutChip {
 public:
 	ReadoutChip(int rocnum, std::vector<Hit> hl);
 
-	int size();
+	//Returns the number of hits on the readout chip
+	int size() const {
+	  return hitList.size();
+	}
 
 	int rocnum() const {
 	  return rocnum_;
