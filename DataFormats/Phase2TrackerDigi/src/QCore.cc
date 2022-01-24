@@ -29,7 +29,7 @@ QCore::QCore(int rocid, int ccol_in, int qcrow_in, bool isneighbour_in, bool isl
 }
 
 //Takes in a hitmap in sensor corrdinates with 4x4 regions and converts it to readout chip coordinates with 2x8 regions
-std::vector<bool> QCore::to_ROC_coordinates(std::vector<bool>& hitmap) {
+std::vector<bool> QCore::to_ROC_coordinates(std::vector<bool> hitmap) {
 	std::vector<bool> ROC_hitmap(16, 0);
 	//ROC_hitmap.reserve(hitmap.size());
 
@@ -92,7 +92,7 @@ std::vector<bool> QCore::int_to_binary(int num, int length) {
 }
 
 //Takes in a hitmap and returns true if it contains any hits
-bool QCore::contains_hit(std::vector<bool>& hitmap) {
+bool QCore::contains_hit(std::vector<bool> hitmap) {
         for(size_t i = 0; i < hitmap.size(); i++) {
                 if(hitmap[i]) {
                         return true;

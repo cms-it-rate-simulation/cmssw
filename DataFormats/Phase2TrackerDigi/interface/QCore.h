@@ -71,11 +71,11 @@ class QCore{
 
 
  private:
-  std::vector<bool> to_ROC_coordinates(std::vector<bool>& hitmap);
+  std::vector<bool> to_ROC_coordinates(std::vector<bool> hitmap);
 
   std::vector<bool> int_to_binary(int num, int length);
 
-  bool contains_hit(std::vector<bool>& hitmap);
+  bool contains_hit(std::vector<bool> hitmap);
 
   std::vector<bool> get_hitmap_code(std::vector<bool> hitmap);
 
