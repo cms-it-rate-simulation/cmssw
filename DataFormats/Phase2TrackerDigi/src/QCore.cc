@@ -70,7 +70,7 @@ std::vector<bool> QCore::getHitmap() {
 }
 
 //Converts an integer into binary, and formats it with the given length
-std::vector<bool> QCore::int_to_binary(int num, int length) {
+std::vector<bool> QCore::intToBinary(int num, int length) {
 	int n = num;
 	std::vector<bool> bi_num = {};
 	//bi_num.reserve(length);
@@ -141,7 +141,7 @@ std::vector<bool> QCore::encodeQCore(bool is_new_col) {
 	std::vector<bool> code = {};
 
 	if(is_new_col) {
-		std::vector<bool> col_code = int_to_binary(ccol, 6);
+		std::vector<bool> col_code = intToBinary(ccol, 6);
 		code.insert(code.end(), col_code.begin(), col_code.end());
 	}
 
@@ -149,7 +149,7 @@ std::vector<bool> QCore::encodeQCore(bool is_new_col) {
 	code.push_back(isneighbour_);
 
 	if(!isneighbour_) {
-		std::vector<bool> row_code = int_to_binary(qcrow, 8);
+		std::vector<bool> row_code = intToBinary(qcrow, 8);
 		code.insert(code.end(), row_code.begin(), row_code.end());
 	}
 
@@ -158,7 +158,7 @@ std::vector<bool> QCore::encodeQCore(bool is_new_col) {
 
 	for(auto adc : adcs) {
 		if(adc != 0) {
-			std::vector<bool> adc_code = int_to_binary(adc, 4);
+			std::vector<bool> adc_code = intToBinary(adc, 4);
 			code.insert(code.end(), adc_code.begin(), adc_code.end());
 		}
 	}
