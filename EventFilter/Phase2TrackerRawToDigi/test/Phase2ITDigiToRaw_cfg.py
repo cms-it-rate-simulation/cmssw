@@ -148,6 +148,6 @@ from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEar
 process = customiseEarlyDelete(process)
 # End adding early deletion
 process.TFileService = cms.Service('TFileService',
-fileName = cms.string("pixelntuple.root")
+fileName = cms.string("pixelbitstream.root")
 )
 
