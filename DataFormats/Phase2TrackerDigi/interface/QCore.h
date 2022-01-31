@@ -73,7 +73,7 @@ class QCore{
  private:
   std::vector<bool> toRocCoordinates(std::vector<bool>& hitmap);
 
-  std::vector<bool> int_to_binary(int num, int length);
+  std::vector<bool> intToBinary(int num, int length);
 
   bool contains_hit(std::vector<bool>& hitmap);
 
