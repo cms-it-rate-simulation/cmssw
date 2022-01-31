@@ -43,7 +43,7 @@ class QCore{
     isneighbour_ = isneighbour;
   }
 
-  int get_rocid() const {
+  int rocid() const {
     return rocid_;
   }
   
@@ -57,7 +57,7 @@ class QCore{
     return qcrow;
   }
   
-  std::vector<bool> get_hitmap();
+  std::vector<bool> getHitmap();
     
   std::vector<bool> encode_qcore(bool is_new_col);
   
