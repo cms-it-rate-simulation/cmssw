@@ -71,7 +71,7 @@ class QCore{
 
 
  private:
-  std::vector<bool> to_ROC_coordinates(std::vector<bool>& hitmap);
+  std::vector<bool> toRocCoordinates(std::vector<bool>& hitmap);
 
   std::vector<bool> int_to_binary(int num, int length);
 
