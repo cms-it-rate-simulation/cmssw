@@ -30,21 +30,6 @@ class QCore{
     qcrow = -1;
   }
 
-<<<<<<< HEAD
-=======
-
-  void setIsLast(bool islast) {
-    islast_ = islast;
-  }
-
-  bool islast() const {
-    return islast_;
-  }
-
-  void setIsNeighbour(bool isneighbour) {
-    isneighbour_ = isneighbour;
-  }
->>>>>>> changed QCore so that only necessary functions are public
 
   void setIsLast(bool islast) {
     islast_ = islast;
