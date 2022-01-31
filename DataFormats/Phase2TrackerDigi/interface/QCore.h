@@ -75,9 +75,9 @@ class QCore{
 
   std::vector<bool> intToBinary(int num, int length);
 
-  bool contains_hit(std::vector<bool>& hitmap);
+  bool containsHit(std::vector<bool>& hitmap);
 
-  std::vector<bool> get_hitmap_code(std::vector<bool> hitmap);
+  std::vector<bool> getHitmapCode(std::vector<bool> hitmap);
 
 };
 #endif // QCORE_H
