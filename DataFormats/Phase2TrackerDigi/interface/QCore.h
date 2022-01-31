@@ -59,7 +59,7 @@ class QCore{
   
   std::vector<bool> getHitmap();
     
-  std::vector<bool> encode_qcore(bool is_new_col);
+  std::vector<bool> encodeQCore(bool is_new_col);
   
   const bool operator<(const QCore& other) {
     if (ccol==other.ccol) {
