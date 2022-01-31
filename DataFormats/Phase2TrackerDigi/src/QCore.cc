@@ -92,7 +92,7 @@ std::vector<bool> QCore::intToBinary(int num, int length) {
 }
 
 //Takes in a hitmap and returns true if it contains any hits
-bool QCore::contains_hit(std::vector<bool>& hitmap) {
+bool QCore::containsHit(std::vector<bool>& hitmap) {
         for(size_t i = 0; i < hitmap.size(); i++) {
                 if(hitmap[i]) {
                         return true;
@@ -101,7 +101,7 @@ bool QCore::contains_hit(std::vector<bool>& hitmap) {
 }
 
 //Returns the code associated with a given hitmap
-std::vector<bool> QCore::get_hitmap_code(std::vector<bool> hitmap) {
+std::vector<bool> QCore::getHitmapCode(std::vector<bool> hitmap) {
         std::vector<bool> code = {};
         
 	if(hitmap.size() == 1) {
@@ -111,27 +111,27 @@ std::vector<bool> QCore::get_hitmap_code(std::vector<bool> hitmap) {
         std::vector<bool> left_hitmap = std::vector<bool>(hitmap.begin(), hitmap.begin() + hitmap.size() / 2);
         std::vector<bool> right_hitmap = std::vector<bool>(hitmap.begin() + hitmap.size() / 2, hitmap.end());
 
-        bool hit_left = contains_hit(left_hitmap);
-        bool hit_right = contains_hit(right_hitmap);
+        bool hit_left = containsHit(left_hitmap);
+        bool hit_right = containsHit(right_hitmap);
 
         if(hit_left && hit_right) {
 		code.push_back(1);
 		code.push_back(1);
 
-		std::vector<bool> left_code = get_hitmap_code(left_hitmap);
-		std::vector<bool> right_code = get_hitmap_code(right_hitmap);
+		std::vector<bool> left_code = getHitmapCode(left_hitmap);
+		std::vector<bool> right_code = getHitmapCode(right_hitmap);
 		code.insert(code.end(),left_code.begin(),left_code.end());
 		code.insert(code.end(),right_code.begin(),right_code.end());
         } else if(hit_right) {
 		code.push_back(0);
 		
-		std::vector<bool> right_code = get_hitmap_code(right_hitmap);
+		std::vector<bool> right_code = getHitmapCode(right_hitmap);
 		code.insert(code.end(),right_code.begin(),right_code.end());
         } else if(hit_left) {
 		code.push_back(1);
 		code.push_back(0);
 
-		std::vector<bool> left_code = get_hitmap_code(left_hitmap);
+		std::vector<bool> left_code = getHitmapCode(left_hitmap);
 		code.insert(code.end(),left_code.begin(),left_code.end());
         } return code;
 }
@@ -153,7 +153,7 @@ std::vector<bool> QCore::encodeQCore(bool is_new_col) {
 		code.insert(code.end(), row_code.begin(), row_code.end());
 	}
 
-	std::vector<bool> hitmap_code = get_hitmap_code(getHitmap());
+	std::vector<bool> hitmap_code = getHitmapCode(getHitmap());
 	code.insert(code.end(), hitmap_code.begin(), hitmap_code.end());
 
 	for(auto adc : adcs) {
