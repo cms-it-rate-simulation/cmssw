@@ -11,6 +11,10 @@ ReadoutChip::ReadoutChip(int rocnum, std::vector<Hit> hl) {
   rocnum_ = rocnum; 
 }
 
+unsigned int ReadoutChip::size() {
+	return hitList.size();
+}
+
 //Returns the position (row,col) of the 4x4 QCore that contains a given hit
 std::pair<int,int> ReadoutChip::get_QCore_pos(Hit hit) {
 
