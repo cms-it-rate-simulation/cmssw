@@ -55,7 +55,7 @@ std::vector<bool> QCore::to_ROC_coordinates(std::vector<bool>& hitmap) {
 }
 
 //Returns the hitmap for the QCore in the 4x4 sensor coordinates
-std::vector<bool> QCore::get_hitmap() {
+std::vector<bool> QCore::getHitmap() {
     	//assert(adcs.size()==16);
     
 	std::vector<bool> hitmap = {};
@@ -153,7 +153,7 @@ std::vector<bool> QCore::encode_qcore(bool is_new_col) {
 		code.insert(code.end(), row_code.begin(), row_code.end());
 	}
 
-	std::vector<bool> hitmap_code = get_hitmap_code(get_hitmap());
+	std::vector<bool> hitmap_code = get_hitmap_code(getHitmap());
 	code.insert(code.end(), hitmap_code.begin(), hitmap_code.end());
 
 	for(auto adc : adcs) {
