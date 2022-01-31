@@ -137,7 +137,7 @@ std::vector<bool> QCore::get_hitmap_code(std::vector<bool> hitmap) {
 }
 
 //Returns the bit code associated with the QCore
-std::vector<bool> QCore::encode_qcore(bool is_new_col) {
+std::vector<bool> QCore::encodeQCore(bool is_new_col) {
 	std::vector<bool> code = {};
 
 	if(is_new_col) {

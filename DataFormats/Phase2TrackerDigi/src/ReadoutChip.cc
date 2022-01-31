@@ -140,7 +140,7 @@ std::vector<bool> ReadoutChip::get_chip_code() {
 		bool is_new_col = true;
 
                 for(auto& qcore:qcores) {
-                	std::vector<bool> qcore_code = qcore.encode_qcore(is_new_col);
+                	std::vector<bool> qcore_code = qcore.encodeQCore(is_new_col);
 			code.insert(code.end(), qcore_code.begin(), qcore_code.end());
 			
 			is_new_col = qcore.islast();
