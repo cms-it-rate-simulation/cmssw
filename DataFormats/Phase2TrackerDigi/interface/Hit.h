@@ -3,7 +3,6 @@
 
 class Hit {
 	private:
-
 		int row_;
 		int col_;
 		int adc_;
@@ -12,7 +11,6 @@ class Hit {
 		Hit(int row_num, int col_num, int adc_num);
 
 		int row() const {
-
 			return row_;
 		}
 
