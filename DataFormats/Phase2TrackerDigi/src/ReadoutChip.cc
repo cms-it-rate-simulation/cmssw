@@ -37,7 +37,6 @@ QCore ReadoutChip::get_QCore_from_hit(Hit pixel) {
 
         for(const auto& hit:hitList) {
                 if(get_QCore_pos(hit) == pos) {
-
                         int i = (4 * (hit.row() % 4) + (hit.col() % 4) + 8) % 16;
                         adcs[i] = hit.adc();
                 }
