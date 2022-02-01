@@ -75,7 +75,7 @@ process.load("RecoTracker.TrackProducer.TrackRefitters_cff")
 process.TrackRefitter.src = 'generalTracks'
 process.TrackRefitter.NavigationSchool = ""
 
-process.ReadLocalMeasurement = cms.EDAnalyzer("Phase2PixelRawNtuple",
+process.ReadLocalMeasurement = cms.EDAnalyzer("Phase2PixelQCoreNtuple",
                                               trackProducer = cms.InputTag("generalTracks"),
                                               trajectoryInput = cms.InputTag('TrackRefitter::USER'),
                                               #verbose = cms.untracked.bool(True),
