@@ -6,7 +6,7 @@
   <use name="FWCore/ParameterSet"/>
   <use name="FWCore/PluginManager"/>
   <use name="rootcore"/>
-  <use name="EventFilter/Phase2TrackerQCoreToDigi"/>
+  <use name="EventFilter/Phase2TrackerRawToDigi"/>
   <use name="FWCore/ServiceRegistry"/>
   <use name="CommonTools/UtilAlgos"/>
   <use name="DataFormats/TrackReco"/>
