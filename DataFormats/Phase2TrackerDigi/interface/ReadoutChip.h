@@ -21,7 +21,7 @@ public:
 	  return rocnum_;
 	}
 
-	std::vector<QCore> get_organized_QCores();
+	std::vector<QCore> getOrganizedQCores();
 
 	std::vector<bool> get_chip_code();
 
