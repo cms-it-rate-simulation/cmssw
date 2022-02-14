@@ -9,8 +9,8 @@ class QCore{
   bool islast_;
   bool isneighbour_;
   int rocid_;
-  int ccol;
-  int qcrow;
+  int ccol_;
+  int qcrow_;
 
  public:
   QCore(
@@ -26,8 +26,8 @@ class QCore{
     rocid_ = -1;; 
     islast_ = false;
     isneighbour_ = false;
-    ccol = -1;
-    qcrow = -1;
+    ccol_ = -1;
+    qcrow_ = -1;
   }
 
 
@@ -48,13 +48,13 @@ class QCore{
   }
   
   //Returns the column number of the QCore
-  int get_col() const {
-    return ccol;
+  int ccol() const {
+    return ccol_;
   }
   
   //Returns the row number of the QCore
-  int get_row() const {
-    return qcrow;
+  int qcrow() const {
+    return qcrow_;
   }
   
   std::vector<bool> getHitmap();
@@ -62,10 +62,10 @@ class QCore{
   std::vector<bool> encodeQCore(bool is_new_col);
   
   const bool operator<(const QCore& other) {
-    if (ccol==other.ccol) {
-      return ccol < other.ccol;
+    if (ccol_==other.ccol_) {
+      return ccol_ < other.ccol_;
     } else {
-      return qcrow < other.qcrow;
+      return qcrow_ < other.qcrow_;
     }
   }
 

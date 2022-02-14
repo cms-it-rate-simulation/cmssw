@@ -21,8 +21,8 @@
 
 QCore::QCore(int rocid, int ccol_in, int qcrow_in, bool isneighbour_in, bool islast_in, std::vector<int> adcs_in) {
   rocid_ = rocid;
-  ccol = ccol_in;
-  qcrow = qcrow_in;
+  ccol_ = ccol_in;
+  qcrow_ = qcrow_in;
   isneighbour_ = isneighbour_in;
   islast_ = islast_in;
   adcs = adcs_in;
@@ -141,7 +141,7 @@ std::vector<bool> QCore::encodeQCore(bool is_new_col) {
 	std::vector<bool> code = {};
 
 	if(is_new_col) {
-		std::vector<bool> col_code = intToBinary(ccol, 6);
+		std::vector<bool> col_code = intToBinary(ccol_, 6);
 		code.insert(code.end(), col_code.begin(), col_code.end());
 	}
 
@@ -149,7 +149,7 @@ std::vector<bool> QCore::encodeQCore(bool is_new_col) {
 	code.push_back(isneighbour_);
 
 	if(!isneighbour_) {
-		std::vector<bool> row_code = intToBinary(qcrow, 8);
+		std::vector<bool> row_code = intToBinary(qcrow_, 8);
 		code.insert(code.end(), row_code.begin(), row_code.end());
 	}
 

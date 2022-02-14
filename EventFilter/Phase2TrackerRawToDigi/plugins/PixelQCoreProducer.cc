@@ -285,7 +285,7 @@ void PixelQCoreProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
 
       std::cout << "Got chip " << i << std::endl;
       
-      std::vector<QCore> qcores = chip.get_organized_QCores();
+      std::vector<QCore> qcores = chip.getOrganizedQCores();
 
       std::cout << "Got qcores " << std::endl;
       
