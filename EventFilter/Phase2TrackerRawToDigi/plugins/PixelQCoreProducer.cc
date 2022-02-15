@@ -122,60 +122,102 @@ PixelQCoreProducer::~PixelQCoreProducer() {
 // member functions
 //
 
+Hit updateHitCoordinatesForLargePixels(Hit & hit) {
+        /*
+        In-place modification of Hit coordinates to take into account large pixels
+        
+        Hits corresponding to large pixels are remapped so they
+        lie on the boundary of the chip.
+
+        Note that this operation can produce multiple hits with the same
+        row/column coordinates!
+        */
+
+        // Current values before remapping
+        int row = hit.row();
+        int col = hit.col();
+
+        // Values after remapping
+        int updated_row = row;
+        int updated_col = col;
+
+
+        // Remapping of row coordinate
+        if (row < 672) {
+                updated_row = row;
+        } else if(row <= 675) {
+                updated_row = 671;
+        } else if(row <= 679) {
+                updated_row = 672;
+        } else {
+                updated_row = hit.row() - 8;
+        }
+
+        // Remapping of column coordinate
+        if(col < 216) {
+                updated_col = col;
+        } else if(col == 216) {
+                updated_col = 215;
+        } else if(col == 217) {
+                updated_col = 216;
+        } else {
+                updated_col = hit.col() - 2;
+        }
+
+        hit.set_row(updated_row);
+        hit.set_col(updated_col);
+
+        return hit;
+}
 std::vector<Hit> adjustEdges(std::vector<Hit> hitList) {
-        std::vector<Hit> hitListOne = {};
-        std::vector<Hit> hitListTwo = {};
-
-        for(auto hit:hitList) {
-                if(hit.row() < 672) {
-                        hitListOne.push_back(hit);
-                } else if(672 <= hit.row() && hit.row() <= 675) {
-                        hitListOne.push_back(Hit(671, hit.col(), hit.adc()));
-                } else if(676 <= hit.row() && hit.row() <= 679) {
-                        hitListOne.push_back(Hit(672, hit.col(), hit.adc()));
-                } else if(hit.row() > 679) {
-                        hitListOne.push_back(Hit(hit.row() - 8, hit.col(), hit.adc()));
-                }
-        }
-
-        for(auto hit:hitListOne) {
-                if(hit.col() < 216) {
-                        hitListTwo.push_back(hit);
-                } else if(hit.col() == 216) {
-                        hitListTwo.push_back(Hit(hit.row(), 215, hit.adc()));
-                } else if(hit.col() == 217) {
-                        hitListTwo.push_back(Hit(hit.row(), 216, hit.adc()));
-                } else if(hit.col() > 217) {
-                        hitListTwo.push_back(Hit(hit.row(), hit.col() - 2, hit.adc()));
-                }
-        }
-
-        return hitListTwo;
+        /*
+        In-place modification of Hit coordinates to take into account large pixels
+        */
+        std::for_each(hitList.begin(), hitList.end(), &updateHitCoordinatesForLargePixels);
+        return hitList;
 }
 
 std::vector<ReadoutChip> splitByChip(std::vector<Hit> hitList) {
-        std::vector<Hit> chip1 = {};
-        std::vector<Hit> chip2 = {};
-        std::vector<Hit> chip3 = {};
-        std::vector<Hit> chip4 = {};
+        /*
+        Generate a list of ReadoutChip objects from a list of hits of the full module.
 
+        The splitting assumption is:
+        - low row, low column: chip 0
+        - low row, high column: chip 1
+        - high row, low column: chip 2
+        - high row, high column: chip 3
+
+        Graphically, with x axis increases from left to right,
+        and the y axis increasing from top to bottom:
+
+        -------------------
+        |        |        |
+        | chip 0 | chip 1 |
+        |        |        |
+        -------------------
+        |        |        |
+        | chip 2 | chip 3 |
+        |        |        |
+        -------------------
+        */
+
+        // Split the hit list by read out chip
+        std::vector<std::vector<Hit>> hits_per_chip(4);
         for(auto hit:hitList) {
-                if(hit.row() < 672) {
-                        if(hit.col() < 216) {
-                                chip1.push_back(hit);
-                        } else {
-                                chip2.push_back(hit);
-                        }
-                } else {
-                        if(hit.col() < 216) {
-                                chip3.push_back(hit);
-                        } else {
-                                chip4.push_back(hit);
-                        }
+                int chip_index = hit.col() < 216 ? 0 : 1;
+                if(hit.row() >= 672){
+                        chip_index += 2;
                 }
+                hits_per_chip[chip_index].push_back(hit);
         }
 
-        return {ReadoutChip(0,chip1), ReadoutChip(1, chip2), ReadoutChip(2, chip3),ReadoutChip(3, chip4)};
+        // Generate ReadoutChip objects from the hit lists
+        std::vector<ReadoutChip> chips;
+        for (int chip_index=0; chip_index<4; chip_index++) {
+                chips.push_back(ReadoutChip(chip_index, hits_per_chip[chip_index]));
+        }
+
+        return chips;
 }
 
 std::vector<ReadoutChip> processHits(std::vector<Hit> hitList) {
