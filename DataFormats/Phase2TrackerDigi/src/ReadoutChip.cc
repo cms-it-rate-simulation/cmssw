@@ -26,12 +26,7 @@ std::pair<int,int> ReadoutChip::get_QCore_pos(Hit hit) {
 
 //Takes in a hit and returns the 4x4 QCore that hit is a part of
 QCore ReadoutChip::get_QCore_from_hit(Hit pixel) {
-        std::vector<int> adcs =
-                {0,0,0,0,
-		0,0,0,0,
-                0,0,0,0,
-		0,0,0,0};
-
+        std::vector<int> adcs(16,0);
         std::pair<int,int> pos = get_QCore_pos(pixel);
 
         for(const auto& hit:hitList) {
