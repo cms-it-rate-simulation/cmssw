@@ -122,10 +122,10 @@ protected:
 
   void processHits(const std::vector<std::pair<int, int> >& hitList);
 
-  std::pair<float, float> computeAnglesFromDetPosition(const SiPixelCluster& cl,
+  /*std::pair<float, float> computeAnglesFromDetPosition(const SiPixelCluster& cl,
                                                        const PixelTopology& top,
                                                        const GeomDetUnit& det) const;
-
+  */
 private:
   edm::ParameterSet const conf_;
   TrackerHitAssociator::Config trackerHitAssociatorConfig_;
@@ -362,8 +362,8 @@ void Phase2PixelQCoreNtupleAltered::analyze(const edm::Event& e, const edm::Even
   std::vector<PSimHit> matched;
   const PSimHit* closest_simhit = nullptr;
 
-  edm::Handle<SiPixelRecHitCollection> recHitColl;
-  e.getByToken(pixelRecHits_token_, recHitColl);
+  //edm::Handle<SiPixelRecHitCollection> recHitColl;
+  //e.getByToken(pixelRecHits_token_, recHitColl);
 
   edm::Handle<edm::DetSetVector<QCore> > aQCoreVector;
   e.getByToken(qcore_token_, aQCoreVector);
@@ -468,7 +468,7 @@ void Phase2PixelQCoreNtupleAltered::analyze(const edm::Event& e, const edm::Even
 
   */
 
-  if ((recHitColl.product())->dataSize() > 0) {
+  /*if ((recHitColl.product())->dataSize() > 0) {
     std::string detname;
 
     evt_.init();
@@ -512,7 +512,8 @@ void Phase2PixelQCoreNtupleAltered::analyze(const edm::Event& e, const edm::Even
             }
           }  // end of simhit loop
         }    // end matched emtpy
-        unsigned int subid = detId.subdetId();
+  
+	unsigned int subid = detId.subdetId();
         int detid_db = detId.rawId();
         int layer_num = -99, ladder_num = -99, module_num = -99, disk_num = -99, blade_num = -99, panel_num = -99,
             side_num = -99;
@@ -554,7 +555,7 @@ void Phase2PixelQCoreNtupleAltered::analyze(const edm::Event& e, const edm::Even
       }  // end of rechit loop
     }    // end of detid loop
   }      // end of loop test on recHitColl size
-
+*/
   // Now loop over recotracks
   edm::Handle<View<reco::Track>> trackCollection;
   e.getByToken(recoTracks_token_, trackCollection);
@@ -686,7 +687,7 @@ void Phase2PixelQCoreNtupleAltered::analyze(const edm::Event& e, const edm::Even
                         pixhit,  // SiPixelRecHit *
                         num_simhit,
                         closest_simhit,
-                        geomDet,
+					geomDet,
                         tsos);
             pixeltreeOnTrack_->Fill();
           }  // if ( (subid==1)||(subid==2) )
@@ -710,7 +711,7 @@ void Phase2PixelQCoreNtupleAltered::fillPRecHit(const int detid_db,
                                     SiPixelRecHitCollection::DetSet::const_iterator pixeliter,
                                     const int num_simhit,
                                     const PSimHit* closest_simhit,
-                                    const GeomDet* PixGeom) {
+								   const GeomDet* PixGeom) {
   LocalPoint lp = pixeliter->localPosition();
   LocalError le = pixeliter->localPositionError();
 
@@ -757,7 +758,7 @@ void Phase2PixelQCoreNtupleAltered::fillPRecHit(const int detid_db,
   recHit_.row = mp.x();
   recHit_.col = mp.y();
 
-  if (Cluster.isNonnull()) {
+  /*if (Cluster.isNonnull()) {
     // compute local angles from det position
     std::pair<float, float> local_angles = computeAnglesFromDetPosition(*Cluster, *topol, *theGeomDet);
     recHit_.cotAlphaFromDet = local_angles.first;
@@ -784,7 +785,7 @@ void Phase2PixelQCoreNtupleAltered::fillPRecHit(const int detid_db,
       ++recHit_.fDgN;
     }
   }  // if ( Cluster.isNonnull() )
-
+  */
 #ifdef EDM_ML_DEBUG
   std::cout << "num_simhit = " << num_simhit << std::endl;
 #endif
@@ -882,7 +883,7 @@ void Phase2PixelQCoreNtupleAltered::fillPRecHit(const int detid_db,
   recHit_.panel = panel_num;
   recHit_.side = side_num;
 
-  /*-- module topology --*/
+  //-- module topology --
   const PixelGeomDetUnit* theGeomDet = dynamic_cast<const PixelGeomDetUnit*>(PixGeom);
   const PixelTopology* topol = &(theGeomDet->specificTopology());
   recHit_.nRowsInDet = topol->nrows();
@@ -891,7 +892,7 @@ void Phase2PixelQCoreNtupleAltered::fillPRecHit(const int detid_db,
   recHit_.pitchy = topol->pitch().second;
   recHit_.thickness = theGeomDet->surface().bounds().thickness();
 
-  if (Cluster.isNonnull()) {
+  /* if (Cluster.isNonnull()) {
     // compute local angles from det position
     std::pair<float, float> local_angles = computeAnglesFromDetPosition(*Cluster, *topol, *theGeomDet);
     recHit_.cotAlphaFromDet = local_angles.first;
@@ -922,7 +923,7 @@ void Phase2PixelQCoreNtupleAltered::fillPRecHit(const int detid_db,
       ++recHit_.fDgN;
     }
   }  // if ( Cluster.isNonnull() )
-
+  */
   if (num_simhit > 0) {
     recHit_.pdgid = closest_simhit->particleType();
     recHit_.process = closest_simhit->processType();
@@ -1013,7 +1014,7 @@ void Phase2PixelQCoreNtupleAltered::RecHit::init() {
   }
   fDgN = 0;
 }
-std::pair<float, float> Phase2PixelQCoreNtupleAltered::computeAnglesFromDetPosition(const SiPixelCluster& cl,
+/*std::pair<float, float> Phase2PixelQCoreNtupleAltered::computeAnglesFromDetPosition(const SiPixelCluster& cl,
                                                                         const PixelTopology& theTopol,
                                                                         const GeomDetUnit& theDet) const {
   // get cluster center of gravity (of charge)
@@ -1037,7 +1038,7 @@ std::pair<float, float> Phase2PixelQCoreNtupleAltered::computeAnglesFromDetPosit
   float cotbeta_ = gvy * gvz;
 
   return std::make_pair(cotalpha_, cotbeta_);
-}
+  }*/
 
 void Phase2PixelQCoreNtupleAltered::processHits(const std::vector<std::pair<int, int> >& hitList) {
 
