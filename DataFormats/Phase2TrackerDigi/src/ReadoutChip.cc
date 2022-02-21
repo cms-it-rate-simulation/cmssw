@@ -25,7 +25,7 @@ std::pair<int,int> ReadoutChip::get_QCore_pos(Hit hit) {
 }
 
 //Takes in a hit and returns the 4x4 QCore that hit is a part of
-QCore ReadoutChip::get_QCore_from_hit(Hit pixel) {
+QCore ReadoutChip::getQCoreFromHit(Hit pixel) {
         std::vector<int> adcs =
                 {0,0,0,0,
 		0,0,0,0,
@@ -123,7 +123,7 @@ std::vector<QCore> ReadoutChip::getOrganizedQCores() {
         std::vector<QCore> qcores = {};
 
         for(const auto& hit:hitList) {
-                qcores.push_back(get_QCore_from_hit(hit));
+                qcores.push_back(getQCoreFromHit(hit));
         }
 
         return link_QCores(organize_QCores(rem_duplicates(qcores)));

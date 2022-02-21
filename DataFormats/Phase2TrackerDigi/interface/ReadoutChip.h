@@ -28,7 +28,7 @@ public:
 private:
 	std::pair<int,int> get_QCore_pos(Hit hit);
 
-	QCore get_QCore_from_hit(Hit pixel);
+	QCore getQCoreFromHit(Hit pixel);
 
 	std::vector<QCore> rem_duplicates(std::vector<QCore> qcores);
 
