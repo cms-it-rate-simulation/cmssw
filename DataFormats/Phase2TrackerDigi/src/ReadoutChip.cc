@@ -46,6 +46,7 @@ QCore ReadoutChip::getQCoreFromHit(Hit pixel) {
         return qcore;
 }
 
+/*
 //Removes duplicates from the given list of qcores
 std::vector<QCore> ReadoutChip::rem_duplicates(std::vector<QCore> qcores) {
         std::vector<QCore> list = {};
@@ -63,6 +64,7 @@ std::vector<QCore> ReadoutChip::rem_duplicates(std::vector<QCore> qcores) {
 
         return list;
 }
+*/
 
 //Returns a list of the qcores with hits arranged by increasing column then row numbers
 std::vector<QCore> ReadoutChip::organize_QCores(std::vector<QCore> qcores) {
@@ -117,6 +119,7 @@ std::vector<QCore> link_QCores(std::vector<QCore> qcores) {
 	return qcores;
 }
 
+/*
 //Takes in list of hits and organizes them into the 4x4 QCores that contains them
 std::vector<QCore> ReadoutChip::getOrganizedQCores() {
   std::cout << "In getOrganizedQCores" <<std::endl;
@@ -127,6 +130,32 @@ std::vector<QCore> ReadoutChip::getOrganizedQCores() {
         }
 
         return link_QCores(organize_QCores(rem_duplicates(qcores)));
+}
+*/
+
+//Takes in list of hits and organizes them into the 4x4 QCores that contains them
+std::vector<QCore> ReadoutChip::getOrganizedQCores() {
+  std::cout << "In getOrganizedQCores" <<std::endl;
+        std::vector<QCore> qcores = {};
+	bool qcore_already_exists;
+	std::pair<int,int> qcore_pos;
+
+        for(const auto& hit:hitList) {
+		qcore_already_exists = false;
+		qcore_pos = getQCorePos(hit);
+
+		for(size_t i = 0; i < qcores.size(); i++) {
+			if(qcores[i].qcrow() == qcore_pos.first && qcores[i].ccol() == qcore_pos.second) {
+				qcore_already_exists = true;
+			}
+		}
+
+		if(!qcore_already_exists) {
+                	qcores.push_back(getQCoreFromHit(hit));
+		}
+        }
+
+        return link_QCores(organize_QCores(qcores));
 }
 
 //Returns the encoding of the readout chip
