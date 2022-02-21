@@ -130,7 +130,7 @@ std::vector<QCore> ReadoutChip::getOrganizedQCores() {
 }
 
 //Returns the encoding of the readout chip
-std::vector<bool> ReadoutChip::get_chip_code() {
+std::vector<bool> ReadoutChip::getChipCode() {
         std::vector<bool> code = {};
 
         if(hitList.size() > 0) {

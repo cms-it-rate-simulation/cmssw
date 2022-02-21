@@ -23,7 +23,7 @@ public:
 
 	std::vector<QCore> getOrganizedQCores();
 
-	std::vector<bool> get_chip_code();
+	std::vector<bool> getChipCode();
 
 private:
 	std::pair<int,int> get_QCore_pos(Hit hit);

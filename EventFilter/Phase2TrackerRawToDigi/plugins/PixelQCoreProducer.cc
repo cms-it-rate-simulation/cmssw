@@ -193,7 +193,7 @@ std::vector<ReadoutChip> processHits(std::vector<Hit> hitList) {
 
         for(size_t i = 0; i < chips.size(); i++) {
                 ReadoutChip chip = chips[i];
-                code = chip.get_chip_code();
+                code = chip.getChipCode();
 
                 std::cout << "number of hits: " << chip.size() << "\n";
                 std::cout << "code length: " << code.size() << "\n";
@@ -294,7 +294,7 @@ void PixelQCoreProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
 	DetSetQCores.push_back(qcore);
       }
 
-      ROCBitStream aROCBitStream(i,chip.get_chip_code());
+      ROCBitStream aROCBitStream(i,chip.getChipCode());
 
       DetSetBitStream.push_back(aROCBitStream);
 
