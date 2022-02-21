@@ -16,7 +16,7 @@ unsigned int ReadoutChip::size() {
 }
 
 //Returns the position (row,col) of the 4x4 QCore that contains a given hit
-std::pair<int,int> ReadoutChip::get_QCore_pos(Hit hit) {
+std::pair<int,int> ReadoutChip::getQCorePos(Hit hit) {
 
         int row = hit.row() / 4;
         int col = hit.col() / 4;
@@ -32,10 +32,10 @@ QCore ReadoutChip::getQCoreFromHit(Hit pixel) {
                 0,0,0,0,
 		0,0,0,0};
 
-        std::pair<int,int> pos = get_QCore_pos(pixel);
+        std::pair<int,int> pos = getQCorePos(pixel);
 
         for(const auto& hit:hitList) {
-                if(get_QCore_pos(hit) == pos) {
+                if(getQCorePos(hit) == pos) {
                         int i = (4 * (hit.row() % 4) + (hit.col() % 4) + 8) % 16;
                         adcs[i] = hit.adc();
                 }

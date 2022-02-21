@@ -26,7 +26,7 @@ public:
 	std::vector<bool> getChipCode();
 
 private:
-	std::pair<int,int> get_QCore_pos(Hit hit);
+	std::pair<int,int> getQCorePos(Hit hit);
 
 	QCore getQCoreFromHit(Hit pixel);
 
