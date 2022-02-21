@@ -387,7 +387,7 @@ void Phase2PixelQCoreNtupleAltered::analyze(const edm::Event& e, const edm::Even
     for ( auto iterQCore = theQCores.begin();
           iterQCore != theQCores.end();
           ++iterQCore ) {
-      std::cout << "QCORE : " << iterQCore->get_rocid() << " " << iterQCore->get_col() << " " << iterQCore->get_row() << std::endl;
+      std::cout << "QCORE : " << iterQCore->rocid() << " " << iterQCore->ccol() << " " << iterQCore->qcrow() << std::endl;
     }
   }
 

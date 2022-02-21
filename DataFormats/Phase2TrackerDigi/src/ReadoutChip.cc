@@ -52,7 +52,7 @@ std::vector<QCore> ReadoutChip::rem_duplicates(std::vector<QCore> qcores) {
 
         while(qcores.size() > 0) {
                 for(size_t i = 1; i < qcores.size(); i++) {
-                        if(qcores[i].get_col() == qcores[0].get_col() && qcores[i].get_row() == qcores[0].get_row()) {
+                        if(qcores[i].ccol() == qcores[0].ccol() && qcores[i].qcrow() == qcores[0].qcrow()) {
                                 qcores.erase(qcores.begin() + i);
                         }
                 }
@@ -72,9 +72,9 @@ std::vector<QCore> ReadoutChip::organize_QCores(std::vector<QCore> qcores) {
                 int min = 0;
 
                 for(size_t i = 1; i < qcores.size(); i++) {
-                        if(qcores[i].get_col() < qcores[min].get_col()) {
+                        if(qcores[i].ccol() < qcores[min].ccol()) {
                                 min = i;
-                        } else if(qcores[i].get_col() == qcores[min].get_col() && qcores[i].get_row() < qcores[min].get_row()) {
+                        } else if(qcores[i].ccol() == qcores[min].ccol() && qcores[i].qcrow() < qcores[min].qcrow()) {
                                 min = i;
                         }
                 }
@@ -90,7 +90,7 @@ std::vector<QCore> ReadoutChip::organize_QCores(std::vector<QCore> qcores) {
 std::vector<QCore> link_QCores(std::vector<QCore> qcores) {
   std::cout << "In link_QCores size " << qcores.size() << std::endl;
 	for(size_t i = 1; i < qcores.size(); i++) {
-		if(qcores[i].get_row() == qcores[i - 1].get_row()) {
+		if(qcores[i].qcrow() == qcores[i - 1].qcrow()) {
 			qcores[i].setIsNeighbour(true);
 		}
 	}
@@ -102,7 +102,7 @@ std::vector<QCore> link_QCores(std::vector<QCore> qcores) {
 	  //size is unsigned so if size is zero size()-1 is a huge number...
 	  //Hence this needs to be procted
 	  for(size_t i = 0; i < qcores.size() - 1; i++) {
-	    if(qcores[i].get_col() != qcores[i + 1].get_col()) {
+	    if(qcores[i].ccol() != qcores[i + 1].ccol()) {
 	      qcores[i].setIsLast(true);
 	    }
 	  }
@@ -118,8 +118,8 @@ std::vector<QCore> link_QCores(std::vector<QCore> qcores) {
 }
 
 //Takes in list of hits and organizes them into the 4x4 QCores that contains them
-std::vector<QCore> ReadoutChip::get_organized_QCores() {
-  std::cout << "In get_organized_QCores" <<std::endl;
+std::vector<QCore> ReadoutChip::getOrganizedQCores() {
+  std::cout << "In getOrganizedQCores" <<std::endl;
         std::vector<QCore> qcores = {};
 
         for(const auto& hit:hitList) {
@@ -134,7 +134,7 @@ std::vector<bool> ReadoutChip::get_chip_code() {
         std::vector<bool> code = {};
 
         if(hitList.size() > 0) {
-                std::vector<QCore> qcores = get_organized_QCores();
+                std::vector<QCore> qcores = getOrganizedQCores();
 
 		bool is_new_col = true;
 
