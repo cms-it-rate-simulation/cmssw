@@ -46,26 +46,6 @@ QCore ReadoutChip::getQCoreFromHit(Hit pixel) {
         return qcore;
 }
 
-/*
-//Removes duplicates from the given list of qcores
-std::vector<QCore> ReadoutChip::rem_duplicates(std::vector<QCore> qcores) {
-        std::vector<QCore> list = {};
-
-        while(qcores.size() > 0) {
-                for(size_t i = 1; i < qcores.size(); i++) {
-                        if(qcores[i].ccol() == qcores[0].ccol() && qcores[i].qcrow() == qcores[0].qcrow()) {
-                                qcores.erase(qcores.begin() + i);
-                        }
-                }
-
-                list.push_back(qcores[0]);
-                qcores.erase(qcores.begin());
-        }
-
-        return list;
-}
-*/
-
 //Returns a list of the qcores with hits arranged by increasing column then row numbers
 std::vector<QCore> ReadoutChip::organize_QCores(std::vector<QCore> qcores) {
         std::vector<QCore> organized_list = {};
@@ -118,20 +98,6 @@ std::vector<QCore> link_QCores(std::vector<QCore> qcores) {
 
 	return qcores;
 }
-
-/*
-//Takes in list of hits and organizes them into the 4x4 QCores that contains them
-std::vector<QCore> ReadoutChip::getOrganizedQCores() {
-  std::cout << "In getOrganizedQCores" <<std::endl;
-        std::vector<QCore> qcores = {};
-
-        for(const auto& hit:hitList) {
-                qcores.push_back(getQCoreFromHit(hit));
-        }
-
-        return link_QCores(organize_QCores(rem_duplicates(qcores)));
-}
-*/
 
 //Takes in list of hits and organizes them into the 4x4 QCores that contains them
 std::vector<QCore> ReadoutChip::getOrganizedQCores() {

@@ -30,8 +30,6 @@ private:
 
 	QCore getQCoreFromHit(Hit pixel);
 
-	//std::vector<QCore> rem_duplicates(std::vector<QCore> qcores);
-
 	std::vector<QCore> organize_QCores(std::vector<QCore> qcores);
 };
 
