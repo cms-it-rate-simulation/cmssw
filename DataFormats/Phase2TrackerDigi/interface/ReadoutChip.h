@@ -23,14 +23,12 @@ public:
 
 	std::vector<QCore> getOrganizedQCores();
 
-	std::vector<bool> get_chip_code();
+	std::vector<bool> getChipCode();
 
 private:
-	std::pair<int,int> get_QCore_pos(Hit hit);
+	std::pair<int,int> getQCorePos(Hit hit);
 
-	QCore get_QCore_from_hit(Hit pixel);
-
-	std::vector<QCore> rem_duplicates(std::vector<QCore> qcores);
+	QCore getQCoreFromHit(Hit pixel);
 
 	std::vector<QCore> organize_QCores(std::vector<QCore> qcores);
 };

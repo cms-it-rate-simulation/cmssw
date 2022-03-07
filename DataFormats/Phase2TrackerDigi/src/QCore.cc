@@ -19,13 +19,13 @@
     {
     };*/
 
-QCore::QCore(int rocid, int ccol_in, int qcrow_in, bool isneighbour_in, bool islast_in, std::vector<int> adcs_in) {
+QCore::QCore(int rocid, int ccol, int qcrow, bool isneighbour, bool islast, std::vector<int> adcs) {
   rocid_ = rocid;
-  ccol_ = ccol_in;
-  qcrow_ = qcrow_in;
-  isneighbour_ = isneighbour_in;
-  islast_ = islast_in;
-  adcs = adcs_in;
+  ccol_ = ccol;
+  qcrow_ = qcrow;
+  isneighbour_ = isneighbour;
+  islast_ = islast;
+  adcs_ = adcs;
 }
 
 //Takes in a hitmap in sensor corrdinates with 4x4 regions and converts it to readout chip coordinates with 2x8 regions
@@ -61,7 +61,7 @@ std::vector<bool> QCore::getHitmap() {
 	std::vector<bool> hitmap = {};
 
     	//hitmap.reserve(16);
-    	for(auto adc : adcs) {
+    	for(auto adc : adcs_) {
         	hitmap.push_back(adc > 0);
     	}
 	//assert(hitmap.size()==16);
@@ -156,7 +156,7 @@ std::vector<bool> QCore::encodeQCore(bool is_new_col) {
 	std::vector<bool> hitmap_code = getHitmapCode(getHitmap());
 	code.insert(code.end(), hitmap_code.begin(), hitmap_code.end());
 
-	for(auto adc : adcs) {
+	for(auto adc : adcs_) {
 		if(adc != 0) {
 			std::vector<bool> adc_code = intToBinary(adc, 4);
 			code.insert(code.end(), adc_code.begin(), adc_code.end());

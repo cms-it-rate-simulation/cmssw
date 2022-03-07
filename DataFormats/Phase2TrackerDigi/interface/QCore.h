@@ -5,7 +5,7 @@
 class QCore{
 
  private:
-  std::vector<int> adcs;
+  std::vector<int> adcs_;
   bool islast_;
   bool isneighbour_;
   int rocid_;
@@ -15,11 +15,11 @@ class QCore{
  public:
   QCore(
 	int rocid,
-	int ccol_in,
-	int qcrow_in,
-	bool isneighbour_in,
-	bool islast_in,
-	std::vector<int> adcs_in
+	int ccol,
+	int qcrow,
+	bool isneighbour,
+	bool islast,
+	std::vector<int> adcs
 	);
 
   QCore() {

@@ -153,6 +153,16 @@ std::vector<Hit> adjustEdges(std::vector<Hit> hitList) {
         return hitListTwo;
 }
 
+std::vector<Hit> invertHits(std::vector<Hit>& hitList) {
+	std::vector<Hit> inverted_hitlist = {};
+
+	for(auto hit:hitList) {
+		inverted_hitlist.push_back(Hit(1343 - hit.row(), 431 - hit.col(), hit.adc()));
+	}
+
+	return inverted_hitlist;
+}
+
 std::vector<ReadoutChip> splitByChip(std::vector<Hit> hitList) {
         std::vector<Hit> chip1 = {};
         std::vector<Hit> chip2 = {};
@@ -175,7 +185,7 @@ std::vector<ReadoutChip> splitByChip(std::vector<Hit> hitList) {
                 }
         }
 
-        return {ReadoutChip(0,chip1), ReadoutChip(1, chip2), ReadoutChip(2, chip3),ReadoutChip(3, chip4)};
+        return {ReadoutChip(0,chip1), ReadoutChip(1, chip2), ReadoutChip(2, invertHits(chip3)),ReadoutChip(3, invertHits(chip4))};
 }
 
 std::vector<ReadoutChip> processHits(std::vector<Hit> hitList) {
@@ -193,7 +203,7 @@ std::vector<ReadoutChip> processHits(std::vector<Hit> hitList) {
 
         for(size_t i = 0; i < chips.size(); i++) {
                 ReadoutChip chip = chips[i];
-                code = chip.get_chip_code();
+                code = chip.getChipCode();
 
                 std::cout << "number of hits: " << chip.size() << "\n";
                 std::cout << "code length: " << code.size() << "\n";
@@ -294,7 +304,7 @@ void PixelQCoreProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
 	DetSetQCores.push_back(qcore);
       }
 
-      ROCBitStream aROCBitStream(i,chip.get_chip_code());
+      ROCBitStream aROCBitStream(i,chip.getChipCode());
 
       DetSetBitStream.push_back(aROCBitStream);
 
