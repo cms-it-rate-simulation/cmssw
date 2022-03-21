@@ -126,26 +126,76 @@ std::vector<Hit> adjustEdges(std::vector<Hit> hitList) {
         std::vector<Hit> hitListOne = {};
         std::vector<Hit> hitListTwo = {};
 
+	bool hit_already_exists;
+
         for(auto hit:hitList) {
-                if(hit.row() < 672) {
+                if(hit.row() < 671) {
                         hitListOne.push_back(hit);
-                } else if(672 <= hit.row() && hit.row() <= 675) {
-                        hitListOne.push_back(Hit(671, hit.col(), hit.adc()));
-                } else if(676 <= hit.row() && hit.row() <= 679) {
-                        hitListOne.push_back(Hit(672, hit.col(), hit.adc()));
-                } else if(hit.row() > 679) {
+                } else if(671 <= hit.row() && hit.row() <= 675) {
+			hit_already_exists = false;
+
+			for(auto other_hit : hitListOne) {
+				if(other_hit.row() == 671 && other_hit.col() == hit.col()) {
+					other_hit.addADC(hit.adc());
+					hit_already_exists = true;
+				}
+			}
+
+			if(!hit_already_exists) {
+                        	hitListOne.push_back(Hit(671, hit.col(), hit.adc()));
+			}
+
+                } else if(676 <= hit.row() && hit.row() <= 680) {
+			hit_already_exists = false;
+
+			for(auto other_hit : hitListOne) {
+				if(other_hit.row() == 672 && other_hit.col() == hit.col()) {
+					other_hit.addADC(hit.adc());
+					hit_already_exists = true;
+				}
+			}
+
+			if(!hit_already_exists) {
+                        	hitListOne.push_back(Hit(672, hit.col(), hit.adc()));
+			}
+
+                } else if(hit.row() > 680) {
                         hitListOne.push_back(Hit(hit.row() - 8, hit.col(), hit.adc()));
                 }
         }
 
         for(auto hit:hitListOne) {
-                if(hit.col() < 216) {
+                if(hit.col() < 215) {
                         hitListTwo.push_back(hit);
-                } else if(hit.col() == 216) {
-                        hitListTwo.push_back(Hit(hit.row(), 215, hit.adc()));
-                } else if(hit.col() == 217) {
-                        hitListTwo.push_back(Hit(hit.row(), 216, hit.adc()));
-                } else if(hit.col() > 217) {
+                } else if(215 <= hit.col() && hit.col() <= 216) {
+			hit_already_exists = false;
+
+			for(auto other_hit : hitListTwo) {
+				if(other_hit.row() == hit.row() && other_hit.col() == 215) {
+					other_hit.addADC(hit.adc());
+					hit_already_exists = true;
+				}
+			}
+
+			if(!hit_already_exists) {
+                        	hitListTwo.push_back(Hit(hit.row(), 215, hit.adc()));
+			}
+
+                } else if(217 <= hit.col() && hit.col() <= 218) {
+			hit_already_exists = false;
+
+			for(auto other_hit : hitListTwo) {
+				if(other_hit.row() == hit.row() && other_hit.col() == 216) {
+					other_hit.addADC(hit.adc());
+					hit_already_exists = true;
+				}
+			}
+
+			if(!hit_already_exists) {
+                        	hitListTwo.push_back(Hit(hit.row(), 216, hit.adc()));
+			}
+
+                } else if(hit.col() > 218) {
                         hitListTwo.push_back(Hit(hit.row(), hit.col() - 2, hit.adc()));
                 }
         }

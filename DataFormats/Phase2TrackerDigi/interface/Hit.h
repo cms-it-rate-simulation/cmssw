@@ -21,6 +21,8 @@ class Hit {
 		int adc() const {
 			return adc_;
 		}
+
+		void addADC(int adc);
 };
 
 #endif
