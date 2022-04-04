@@ -23,7 +23,6 @@ class Hit {
 		int row_;
 		int col_;
 		int adc_;
-
 };
 
 #endif
