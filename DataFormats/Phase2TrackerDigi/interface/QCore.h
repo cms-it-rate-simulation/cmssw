@@ -1,16 +1,8 @@
-#ifndef QCORE_H
-#define QCORE_H
+#ifndef DataFormats_Phase2TrackerDigi_QCore_h
+#define DataFormats_Phase2TrackerDigi_QCore_h
 #include<vector>
 
 class QCore{
-
- private:
-  std::vector<int> adcs_;
-  bool islast_;
-  bool isneighbour_;
-  int rocid_;
-  int ccol_;
-  int qcrow_;
 
  public:
   QCore(
@@ -71,6 +63,13 @@ class QCore{
 
 
  private:
+  std::vector<int> adcs_;
+  bool islast_;
+  bool isneighbour_;
+  int rocid_;
+  int ccol_;
+  int qcrow_;
+
   std::vector<bool> toRocCoordinates(std::vector<bool>& hitmap);
 
   std::vector<bool> intToBinary(int num, int length);

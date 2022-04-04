@@ -405,7 +405,7 @@ void Phase2PixelQCoreNtupleAltered::analyze(const edm::Event& e, const edm::Even
     for ( auto iterBitStream = theBitStreams.begin();
           iterBitStream != theBitStreams.end();
           ++iterBitStream ) {
-      std::cout << "BITSTREAM : " << iterBitStream->get_rocid() << " size = " << iterBitStream->get_bitstream().size() << std::endl;
+      std::cout << "BITSTREAM : " << iterBitStream->rocid() << " size = " << iterBitStream->bitstream().size() << std::endl;
     }
   }
 

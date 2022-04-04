@@ -1,14 +1,9 @@
-#ifndef HIT_H
-#define HIT_H
+#ifndef DataFormats_Phase2TrackerDigi_Hit_h
+#define DataFormats_Phase2TrackerDigi_Hit_h
 
 class Hit {
-	private:
-		int row_;
-		int col_;
-		int adc_;
-
 	public:
-		Hit(int row_num, int col_num, int adc_num);
+		Hit(int row, int col, int adc);
 
 		int row() const {
 			return row_;
@@ -23,6 +18,12 @@ class Hit {
 		}
 
 		void addADC(int adc);
+
+	private:
+		int row_;
+		int col_;
+		int adc_;
+
 };
 
 #endif

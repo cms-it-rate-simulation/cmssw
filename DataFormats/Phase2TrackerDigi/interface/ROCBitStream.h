@@ -18,11 +18,11 @@ class ROCBitStream{
     rocid_ = -1;; 
   }
 
-  int get_rocid() const {
+  int rocid() const {
     return rocid_;
   }
 
-  const std::vector<bool>& get_bitstream() const {
+  const std::vector<bool>& bitstream() const {
     return bitstream_;
   }
 
