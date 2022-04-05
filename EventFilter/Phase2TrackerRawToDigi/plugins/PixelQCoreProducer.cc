@@ -364,7 +364,7 @@ void PixelQCoreProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
     aBitStreamVector->insert(DetSetBitStream);
     std::cout << "Add DetSetQCores to DetSetVector" << std::endl;
     aQCoreVector->insert(DetSetQCores);
-    std::cout << "Donee adding DetSetQCores to DetSetVector" << std::endl;
+    std::cout << "Done adding DetSetQCores to DetSetVector" << std::endl;
   }
 
   std::cout << "WILL STORE QCORE DETSETVECTOR IN EVENT" <<std::endl;
