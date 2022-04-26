@@ -1,0 +1,19 @@
+>> Local Products Rules ..... started
+>> Local Products Rules ..... done
+>> Entering Package EventFilter/Phase2TrackerRawToDigi
+>> Entering Package DataFormats/Phase2TrackerDigi
+>> Compiling edm plugin /afs/cern.ch/user/r/rmisra/public/ITRate/CMSSW_11_3_4/src/EventFilter/Phase2TrackerRawToDigi/test/plugins/Phase2PixelQCoreNtuple.cc
+>> Building  edm plugin tmp/slc7_amd64_gcc900/src/EventFilter/Phase2TrackerRawToDigi/test/testEventFilterPhase2TrackerRawToDigiPlugins/libtestEventFilterPhase2TrackerRawToDigiPlugins.so
+Leaving library rule at src/EventFilter/Phase2TrackerRawToDigi/test
+@@@@ Running edmWriteConfigs for testEventFilterPhase2TrackerRawToDigiPlugins
+--- Registered EDM Plugin: testEventFilterPhase2TrackerRawToDigiPlugins
+gmake[1]: Entering directory '/afs/cern.ch/user/r/rmisra/public/ITRate/CMSSW_11_3_4'
+>> Local Products Rules ..... started
+>> Local Products Rules ..... done
+>> Done python_symlink
+@@@@ Refreshing Plugins:edmPluginRefresh
+>> Done generating edm plugin poisoned information
+>> Compiling python modules python
+>> All python modules compiled
+>> Plugins of all types refreshed.
+gmake[1]: Leaving directory '/afs/cern.ch/user/r/rmisra/public/ITRate/CMSSW_11_3_4'
