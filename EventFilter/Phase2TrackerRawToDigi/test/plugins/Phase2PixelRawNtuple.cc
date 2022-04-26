@@ -203,8 +203,7 @@ private:
   } recHit_;
 
   edm::Service<TFileService> tFileService;
-  TTree* pixeltree_;
-  TTree* pixeltreeOnTrack_;
+  TTree* hitData_;
 };
 
 Phase2PixelRawNtuple::Phase2PixelRawNtuple(edm::ParameterSet const& conf)
@@ -218,19 +217,26 @@ Phase2PixelRawNtuple::Phase2PixelRawNtuple(edm::ParameterSet const& conf)
       tta_token_(consumes<TrajTrackAssociationCollection>(conf.getParameter<InputTag>("trajectoryInput"))),
       verbose_(conf.getUntrackedParameter<bool>("verbose", false)),
       picky_(conf.getUntrackedParameter<bool>("picky", false)),
-      pixeltree_(0),
-      pixeltreeOnTrack_(0) {}
+      hitData_(0) {}
 
 Phase2PixelRawNtuple::~Phase2PixelRawNtuple() {}
 
 void Phase2PixelRawNtuple::endJob() {}
 
+<<<<<<< HEAD:EventFilter/Phase2TrackerRawToDigi/test/plugins/Phase2PixelRawNtuple.cc
 void Phase2PixelRawNtuple::beginJob() {
   pixeltree_ = tFileService->make<TTree>("PixelNtuple", "Pixel hit analyzer ntuple");
   pixeltreeOnTrack_ = tFileService->make<TTree>("PixelNtupleOnTrack", "On-Track Pixel hit analyzer ntuple");
+=======
+void Phase2PixelQCoreNtupleTest::beginJob() {
+  hitData_ = tFileService->make<TTree>("Hits Data", "Pixel hit analyzer ntuple");
+>>>>>>> housekeeping:EventFilter/Phase2TrackerRawToDigi/test/plugins/Phase2PixelQCoreNtupleTest.cc
 
   int bufsize = 64000;
+  hitData_->Branch("numHits", &recHit_.numHits, "numHits/F");
+  hitData_->Branch("streamLength", &recHit_.streamLength, "streamLength/F");
   //Common Branch
+  /*
   pixeltree_->Branch("evt", &evt_, "run/I:evtnum/I", bufsize);
   pixeltree_->Branch("pdgid", &recHit_.pdgid, "pdgid/I");
   pixeltree_->Branch("process", &recHit_.process, "process/I");
@@ -342,6 +348,7 @@ void Phase2PixelRawNtuple::beginJob() {
   pixeltreeOnTrack_->Branch("DgDetId", recHit_.fDgDetId, "DgDetId[DgN]/I");
   pixeltreeOnTrack_->Branch("DgAdc", recHit_.fDgAdc, "DgAdc[DgN]/F");
   pixeltreeOnTrack_->Branch("DgCharge", recHit_.fDgCharge, "DgCharge[DgN]/F");
+  */
 }
 
 // Functions that gets called by framework every event
@@ -550,7 +557,7 @@ void Phase2PixelRawNtuple::analyze(const edm::Event& e, const edm::EventSetup& e
                       num_simhit,
                       closest_simhit,
                       geomDet);
-          pixeltree_->Fill();
+          hitData_->Fill();
         }
       }  // end of rechit loop
     }    // end of detid loop
@@ -689,7 +696,7 @@ void Phase2PixelRawNtuple::analyze(const edm::Event& e, const edm::EventSetup& e
                         closest_simhit,
                         geomDet,
                         tsos);
-            pixeltreeOnTrack_->Fill();
+            hitData_->Fill();
           }  // if ( (subid==1)||(subid==2) )
         }    // if cast is possible to SiPixelHit
       }      //end of loop on tracking rechits
