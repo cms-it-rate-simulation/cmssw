@@ -203,10 +203,17 @@ private:
 
     void init();
     } recHit_;
+
+
   int numHits;
   int streamLength;
+
   edm::Service<TFileService> tFileService;
   TTree* readOuts_;
+
+  TH1F* histoBits;
+  TH1F* histoHitNum;
+
 };
 
 Phase2PixelQCoreNtuple::Phase2PixelQCoreNtuple(edm::ParameterSet const& conf)
@@ -220,7 +227,13 @@ Phase2PixelQCoreNtuple::Phase2PixelQCoreNtuple(edm::ParameterSet const& conf)
       //tta_token_(consumes<TrajTrackAssociationCollection>(conf.getParameter<InputTag>("trajectoryInput"))),
       //verbose_(conf.getUntrackedParameter<bool>("verbose", false)),
       //picky_(conf.getUntrackedParameter<bool>("picky", false)),
-      readOuts_(0) {}
+      
+      readOuts_(0) {
+
+	histoBits = tFileService->make<TH1F>("bits", "Bits", 100, 1., 100.);
+	histoHitNum = tFileService->make<TH1F>("hitNum", "Hits", 100, 1., 100.);
+
+}
 
 Phase2PixelQCoreNtuple::~Phase2PixelQCoreNtuple() {}
 
@@ -352,20 +365,20 @@ void Phase2PixelQCoreNtuple::analyze(const edm::Event& e, const edm::EventSetup&
   cout << "In Phase2PixelQCoreNtuple::analyze" << endl;
 
   //Retrieve tracker topology from geometry
-  //edm::ESHandle<TrackerTopology> tTopoHandle;
-  //es.get<TrackerTopologyRcd>().get(tTopoHandle);
+  edm::ESHandle<TrackerTopology> tTopoHandle;
+  es.get<TrackerTopologyRcd>().get(tTopoHandle);
   //const TrackerTopology* const tTopo = tTopoHandle.product();
 
   // geometry setup
-  //edm::ESHandle<TrackerGeometry> geometry;
+  edm::ESHandle<TrackerGeometry> geometry;
 
-  //es.get<TrackerDigiGeometryRecord>().get(geometry);
+  es.get<TrackerDigiGeometryRecord>().get(geometry);
   //const TrackerGeometry* theGeometry = &(*geometry);
 
-  //std::vector<PSimHit> matched;
+  std::vector<PSimHit> matched;
   //const PSimHit* closest_simhit = nullptr;
 
-  //edm::Handle<SiPixelRecHitCollection> recHitColl;
+  edm::Handle<SiPixelRecHitCollection> recHitColl;
   //e.getByToken(pixelRecHits_token_, recHitColl);
 
   edm::Handle<edm::DetSetVector<QCore> > aQCoreVector;
@@ -376,12 +389,12 @@ void Phase2PixelQCoreNtuple::analyze(const edm::Event& e, const edm::EventSetup&
 
   std::cout << "RETRIEVED DETSETVECTOR QCORE : " << std::endl;
 
-  edm::DetSetVector<QCore>::const_iterator iterDet;
-  for ( iterDet = aQCoreVector->begin();
-        iterDet != aQCoreVector->end();
-        iterDet++ ) {
+  edm::DetSetVector<QCore>::const_iterator iterDetQ;
+  for ( iterDetQ = aQCoreVector->begin();
+        iterDetQ != aQCoreVector->end();
+        iterDetQ++ ) {
 
-    DetId tkId = iterDet->id;
+    DetId tkId = iterDetQ->id;
 
     edm::DetSet<QCore> theQCores = (*aQCoreVector)[ tkId ];
 
@@ -393,6 +406,8 @@ void Phase2PixelQCoreNtuple::analyze(const edm::Event& e, const edm::EventSetup&
       std::cout << "QCORE : " << iterQCore->rocid() << " " << iterQCore->ccol() << " " << iterQCore->qcrow() << std::endl;
     }
   }
+
+  //int streamLength;
 
   edm::DetSetVector<ROCBitStream>::const_iterator iterDetBitStream;
   for ( iterDetBitStream = aBitStreamVector->begin();
@@ -408,16 +423,21 @@ void Phase2PixelQCoreNtuple::analyze(const edm::Event& e, const edm::EventSetup&
     for ( auto iterBitStream = theBitStreams.begin();
           iterBitStream != theBitStreams.end();
           ++iterBitStream ) {
+      int streamLength = iterBitStream->get_bitstream().size();
       std::cout << "BITSTREAM : " << iterBitStream->get_rocid() << " size = " << iterBitStream->get_bitstream().size() << std::endl;
+
+      histoBits->Fill(streamLength);
     }
   }
 
+  //readOuts_->Fill();
+
   // for finding matched simhit
-  //TrackerHitAssociator associate(e, trackerHitAssociatorConfig_);
+  // TrackerHitAssociator associate(e, trackerHitAssociatorConfig_);
 
   //Transient Rechit Builders
-  //edm::ESHandle<TransientTrackBuilder> theB;
-  //es.get<TransientTrackRecord>().get("TransientTrackBuilder", theB);
+  edm::ESHandle<TransientTrackBuilder> theB;
+  es.get<TransientTrackRecord>().get("TransientTrackBuilder", theB);
 
   //ttrh builder def
   //ESHandle<TransientTrackingRecHitBuilder> hitBuilder;
@@ -429,8 +449,9 @@ void Phase2PixelQCoreNtuple::analyze(const edm::Event& e, const edm::EventSetup&
 
   edm::Handle<edm::DetSetVector<PixelDigi> > pixelDigiHandle;
   e.getByToken(pixelDigi_token_, pixelDigiHandle);
-}
-  /*
+
+  //readOuts_->Fill();
+  
 
   edm::DetSetVector<PixelDigi>::const_iterator iterDet;
   for ( iterDet = pixelDigiHandle->begin();
@@ -443,7 +464,7 @@ void Phase2PixelQCoreNtuple::analyze(const edm::Event& e, const edm::EventSetup&
 
     std::vector<std::pair<int,int>> hitlist;
     
-    if (tkId.subdetId() == PixelSubdetector::PixelBarrel) {
+    /*if (tkId.subdetId() == PixelSubdetector::PixelBarrel) {
       int layer_num = tTopo->pxbLayer(tkId.rawId());
       int ladder_num = tTopo->pxbLadder(tkId.rawId());
       int module_num = tTopo->pxbModule(tkId.rawId());
@@ -456,9 +477,9 @@ void Phase2PixelQCoreNtuple::analyze(const edm::Event& e, const edm::EventSetup&
       int side_num = tTopo->pxfSide(tkId());
       //cout << "tkID: "<<tkId.subdetId()<<" Module="<<module_num<<" Disk="<<disk_num<<" Blade="<<blade_num
       //	   <<" Panel="<<panel_num<<" Side="<<side_num<<endl;
-    }
+      }*/
 
-
+    /*
     for ( auto iterDigi = theDigis.begin();
           iterDigi != theDigis.end();
           ++iterDigi ) {
@@ -469,9 +490,9 @@ void Phase2PixelQCoreNtuple::analyze(const edm::Event& e, const edm::EventSetup&
 
   }
 
-  */
+  
 
-  /*if ((recHitColl.product())->dataSize() > 0) {
+  if ((recHitColl.product())->dataSize() > 0) {
     std::string detname;
 
     evt_.init();
@@ -483,12 +504,15 @@ void Phase2PixelQCoreNtuple::analyze(const edm::Event& e, const edm::EventSetup&
 
       if (detset.empty())
         continue;
-      DetId detId = DetId(detset.detId());  // Get the Detid object
+      //DetId detId = DetId(detset.detId());
 
-      const GeomDet* geomDet(theGeometry->idToDet(detId));
+
+  // Get the Detid object
+
+      //const GeomDet* geomDet(theGeometry->idToDet(detId));
 
       // Loop over rechits for this detid
-      for (auto iterRecHit : detset) {
+      /*for (auto iterRecHit : detset) {
         // get matched simhit
         matched.clear();
         matched = associate.associateHit(iterRecHit);
@@ -514,15 +538,15 @@ void Phase2PixelQCoreNtuple::analyze(const edm::Event& e, const edm::EventSetup&
               closest_simhit = &m;
             }
           }  // end of simhit loop
-        }    // end matched emtpy
+	  }*/    // end matched emtpy
   
-	unsigned int subid = detId.subdetId();
+      /*unsigned int subid = detId.subdetId();
         int detid_db = detId.rawId();
         int layer_num = -99, ladder_num = -99, module_num = -99, disk_num = -99, blade_num = -99, panel_num = -99,
-            side_num = -99;
-        if ((subid == PixelSubdetector::PixelBarrel) || (subid == PixelSubdetector::PixelEndcap)) {
+	side_num = -99;*/
+      //if ((subid == PixelSubdetector::PixelBarrel) || (subid == PixelSubdetector::PixelEndcap)) {
           // 1 = PXB, 2 = PXF
-          if (subid == PixelSubdetector::PixelBarrel) {
+          /*if (subid == PixelSubdetector::PixelBarrel) {
             layer_num = tTopo->pxbLayer(detId.rawId());
             ladder_num = tTopo->pxbLadder(detId.rawId());
             module_num = tTopo->pxbModule(detId.rawId());
@@ -530,17 +554,18 @@ void Phase2PixelQCoreNtuple::analyze(const edm::Event& e, const edm::EventSetup&
             std::cout << "\ndetId = " << subid << " : " << tTopo->pxbLayer(detId.rawId()) << " , "
                       << tTopo->pxbLadder(detId.rawId()) << " , " << tTopo->pxbModule(detId.rawId());
 #endif
-          } else if (subid == PixelSubdetector::PixelEndcap) {
+} 
+else if (subid == PixelSubdetector::PixelEndcap) {
             module_num = tTopo->pxfModule(detId());
             disk_num = tTopo->pxfDisk(detId());
             blade_num = tTopo->pxfBlade(detId());
             panel_num = tTopo->pxfPanel(detId());
             side_num = tTopo->pxfSide(detId());
-          }
-          int num_simhit = matched.size();
-          recHit_.init();
+	    }*/
+          //int num_simhit = matched.size();
+          //recHit_.init();
           // filling in on ALL track rechits
-          fillPRecHit(detid_db,
+          /*fillPRecHit(detid_db,
                       subid,
                       layer_num,
                       ladder_num,
@@ -552,9 +577,27 @@ void Phase2PixelQCoreNtuple::analyze(const edm::Event& e, const edm::EventSetup&
                       &iterRecHit,
                       num_simhit,
                       closest_simhit,
-                      geomDet);
-          pixeltree_->Fill();
-        }
+                      geomDet);*/
+    /*
+      for ( iterDetBitStream = aBitStreamVector->begin();
+	    iterDetBitStream != aBitStreamVector->end();
+	    iterDetBitStream++ ) {
+
+	DetId tkId = iterDetBitStream->id;
+
+	edm::DetSet<ROCBitStream> theBitStreams = (*aBitStreamVector)[ tkId ];
+
+	std::cout << "BITSTREAM DETID : " << tkId.rawId() << std::endl;
+
+	for ( auto iterBitStream = theBitStreams.begin();
+	      iterBitStream != theBitStreams.end();
+	      ++iterBitStream ) {
+	  streamLength = iterBitStream->get_bitstream().size();
+	  std::cout << "BITSTREAM : " << iterBitStream->get_rocid() << " size = " << iterBitStream->get_bitstream().size() << std::endl;
+	  readOuts_->Fill();
+	}
+      }
+        
       }  // end of rechit loop
     }    // end of detid loop
   }      // end of loop test on recHitColl size
@@ -963,6 +1006,9 @@ else if (!hTTAC.isValid()) {
   }
 }
 */
+  }
+}
+
 void Phase2PixelQCoreNtuple::fillEvt(const edm::Event& E) {
   evt_.run = E.id().run();
   evt_.evtnum = E.id().event();
