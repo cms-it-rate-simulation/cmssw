@@ -21,7 +21,7 @@ public:
 
 	std::vector<QCore> getOrganizedQCores();
 
-	std::vector<bool> getChipCode();
+	std::vector<bool> getChipCode(int event);
 
 private:
 	std::vector<Hit> hitList_;
@@ -34,6 +34,8 @@ private:
 	std::vector<QCore> organizeQCores(std::vector<QCore> qcores);
 
 	std::vector<QCore> linkQCores(std::vector<QCore> qcores);
+  
+	std::vector<bool> intToBinary(int num, int length);
 };
 
 #endif

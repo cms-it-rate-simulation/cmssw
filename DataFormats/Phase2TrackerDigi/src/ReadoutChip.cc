@@ -1,3 +1,4 @@
+#include <cmath>
 #include <vector>
 #include <utility>
 #include <string>
@@ -41,8 +42,8 @@ std::vector<QCore> ReadoutChip::getOrganizedQCores() {
 }
 
 //Returns the encoding of the readout chip
-std::vector<bool> ReadoutChip::getChipCode() {
-        std::vector<bool> code = {};
+std::vector<bool> ReadoutChip::getChipCode(int event) {
+        std::vector<bool> code = intToBinary(event, 8);
 
         if(hitList_.size() > 0) {
                 std::vector<QCore> qcores = getOrganizedQCores();
@@ -142,4 +143,25 @@ std::vector<QCore> ReadoutChip::linkQCores(std::vector<QCore> qcores) {
 	std::cout << "Here003" << std::endl;
 
 	return qcores;
+}
+
+//Converts an integer into binary, and formats it with the given length
+std::vector<bool> ReadoutChip::intToBinary(int num, int length) {
+	int n = num;
+	std::vector<bool> bi_num = {};
+	
+	for(int i = 0; i < length; i++) {
+		bi_num.push_back(0);
+	}
+
+	for(int i = length; i > 0; i--) {
+		if(n >= pow(2, i - 1)) {
+			bi_num[length - i] = 1;
+			n -= pow(2,i - 1);
+		} else {
+			bi_num[length - i] = 0;
+		}
+	}
+
+	return bi_num;
 }
