@@ -12,53 +12,11 @@ ReadoutChip::ReadoutChip(int rocnum, std::vector<Hit> hitList) {
 }
 
 unsigned int ReadoutChip::size() {
+
 	return hitList_.size();
 }
 
-//Takes in list of hits and organizes them into the 4x4 QCores that contains them
-std::vector<QCore> ReadoutChip::getOrganizedQCores() {
-  std::cout << "In getOrganizedQCores" <<std::endl;
-        std::vector<QCore> qcores = {};
-	bool qcore_already_exists;
-	std::pair<int,int> qcore_pos;
 
-        for(const auto& hit : hitList_) {
-		qcore_already_exists = false;
-		qcore_pos = getQCorePos(hit);
-
-		for(size_t i = 0; i < qcores.size(); i++) {
-			if(qcores[i].qcrow() == qcore_pos.first && qcores[i].ccol() == qcore_pos.second) {
-				qcore_already_exists = true;
-			}
-		}
-
-		if(!qcore_already_exists) {
-                	qcores.push_back(getQCoreFromHit(hit));
-		}
-        }
-
-        return linkQCores(organizeQCores(qcores));
-}
-
-//Returns the encoding of the readout chip
-std::vector<bool> ReadoutChip::getChipCode() {
-        std::vector<bool> code = {};
-
-        if(hitList_.size() > 0) {
-                std::vector<QCore> qcores = getOrganizedQCores();
-
-		bool is_new_col = true;
-
-                for(auto& qcore : qcores) {
-                	std::vector<bool> qcore_code = qcore.encodeQCore(is_new_col);
-			code.insert(code.end(), qcore_code.begin(), qcore_code.end());
-			
-			is_new_col = qcore.islast();
-                }
-        }
-
-        return code;
-}
 
 //Returns the position (row,col) of the 4x4 QCore that contains a given hit
 std::pair<int,int> ReadoutChip::getQCorePos(Hit hit) {
@@ -90,6 +48,26 @@ QCore ReadoutChip::getQCoreFromHit(Hit pixel) {
 
         return qcore;
 }
+
+
+//Removes duplicates from the given list of qcores
+std::vector<QCore> ReadoutChip::rem_duplicates(std::vector<QCore> qcores) {
+        std::vector<QCore> list = {};
+
+        while(qcores.size() > 0) {
+                for(size_t i = 1; i < qcores.size(); i++) {
+                        if(qcores[i].ccol() == qcores[0].ccol() && qcores[i].qcrow() == qcores[0].qcrow()) {
+                                qcores.erase(qcores.begin() + i);
+                        }
+                }
+
+                list.push_back(qcores[0]);
+                qcores.erase(qcores.begin());
+        }
+
+        return list;
+}
+
 
 //Returns a list of the qcores with hits arranged by increasing column then row numbers
 std::vector<QCore> ReadoutChip::organizeQCores(std::vector<QCore> qcores) {
@@ -143,3 +121,37 @@ std::vector<QCore> ReadoutChip::linkQCores(std::vector<QCore> qcores) {
 
 	return qcores;
 }
+
+
+//Takes in list of hits and organizes them into the 4x4 QCores that contains them
+std::vector<QCore> ReadoutChip::getOrganizedQCores() {
+  std::cout << "In getOrganizedQCores" <<std::endl;
+        std::vector<QCore> qcores = {};
+
+        for(const auto& hit:hitList) {
+                qcores.push_back(get_QCore_from_hit(hit));
+        }
+
+        return link_QCores(organize_QCores(rem_duplicates(qcores)));
+}
+
+//Returns the encoding of the readout chip
+std::vector<bool> ReadoutChip::get_chip_code() {
+        std::vector<bool> code = {};
+
+        if(hitList.size() > 0) {
+                std::vector<QCore> qcores = getOrganizedQCores();
+
+		bool is_new_col = true;
+
+                for(auto& qcore:qcores) {
+                	std::vector<bool> qcore_code = qcore.encodeQCore(is_new_col);
+			code.insert(code.end(), qcore_code.begin(), qcore_code.end());
+			
+			is_new_col = qcore.islast();
+                }
+        }
+
+        return code;
+}
+

@@ -21,6 +21,7 @@
 
 QCore::QCore(int rocid, int ccol, int qcrow, bool isneighbour, bool islast, std::vector<int> adcs) {
   rocid_ = rocid;
+
   ccol_ = ccol;
   qcrow_ = qcrow;
   isneighbour_ = isneighbour;
@@ -71,6 +72,13 @@ std::vector<bool> QCore::encodeQCore(bool is_new_col) {
 	}
 
 	return code;	
+
+  ccol_ = ccol_in;
+  qcrow_ = qcrow_in;
+  isneighbour_ = isneighbour_in;
+  islast_ = islast_in;
+  adcs = adcs_in;
+
 }
 
 //Takes in a hitmap in sensor corrdinates with 4x4 regions and converts it to readout chip coordinates with 2x8 regions
@@ -98,6 +106,23 @@ std::vector<bool> QCore::toRocCoordinates(std::vector<bool>& hitmap) {
 
 	return ROC_hitmap;
 }
+
+
+//Returns the hitmap for the QCore in the 4x4 sensor coordinates
+std::vector<bool> QCore::getHitmap() {
+    	//assert(adcs.size()==16);
+    
+	std::vector<bool> hitmap = {};
+
+    	//hitmap.reserve(16);
+    	for(auto adc : adcs) {
+        	hitmap.push_back(adc > 0);
+    	}
+	//assert(hitmap.size()==16);
+
+    	return toRocCoordinates(hitmap);
+}
+
 
 //Converts an integer into binary, and formats it with the given length
 std::vector<bool> QCore::intToBinary(int num, int length) {
@@ -165,3 +190,35 @@ std::vector<bool> QCore::getHitmapCode(std::vector<bool> hitmap) {
 		code.insert(code.end(),left_code.begin(),left_code.end());
         } return code;
 }
+
+
+//Returns the bit code associated with the QCore
+std::vector<bool> QCore::encodeQCore(bool is_new_col) {
+	std::vector<bool> code = {};
+
+	if(is_new_col) {
+		std::vector<bool> col_code = intToBinary(ccol_, 6);
+		code.insert(code.end(), col_code.begin(), col_code.end());
+	}
+
+	code.push_back(islast_);
+	code.push_back(isneighbour_);
+
+	if(!isneighbour_) {
+		std::vector<bool> row_code = intToBinary(qcrow_, 8);
+		code.insert(code.end(), row_code.begin(), row_code.end());
+	}
+
+	std::vector<bool> hitmap_code = getHitmapCode(getHitmap());
+	code.insert(code.end(), hitmap_code.begin(), hitmap_code.end());
+
+	for(auto adc : adcs) {
+		if(adc != 0) {
+			std::vector<bool> adc_code = intToBinary(adc, 4);
+			code.insert(code.end(), adc_code.begin(), adc_code.end());
+		}
+	}
+
+	return code;	
+}
+
