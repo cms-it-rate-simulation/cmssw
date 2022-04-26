@@ -6,13 +6,58 @@
 #include "../interface/ReadoutChip.h"
 #include "../interface/Hit.h"
 
-ReadoutChip::ReadoutChip(int rocnum, std::vector<Hit> hl) {
-  hitList = hl;
+ReadoutChip::ReadoutChip(int rocnum, std::vector<Hit> hitList) {
+  hitList_ = hitList;
   rocnum_ = rocnum; 
 }
 
 unsigned int ReadoutChip::size() {
-	return hitList.size();
+	return hitList_.size();
+}
+
+//Takes in list of hits and organizes them into the 4x4 QCores that contains them
+std::vector<QCore> ReadoutChip::getOrganizedQCores() {
+  std::cout << "In getOrganizedQCores" <<std::endl;
+        std::vector<QCore> qcores = {};
+	bool qcore_already_exists;
+	std::pair<int,int> qcore_pos;
+
+        for(const auto& hit : hitList_) {
+		qcore_already_exists = false;
+		qcore_pos = getQCorePos(hit);
+
+		for(size_t i = 0; i < qcores.size(); i++) {
+			if(qcores[i].qcrow() == qcore_pos.first && qcores[i].ccol() == qcore_pos.second) {
+				qcore_already_exists = true;
+			}
+		}
+
+		if(!qcore_already_exists) {
+                	qcores.push_back(getQCoreFromHit(hit));
+		}
+        }
+
+        return linkQCores(organizeQCores(qcores));
+}
+
+//Returns the encoding of the readout chip
+std::vector<bool> ReadoutChip::getChipCode() {
+        std::vector<bool> code = {};
+
+        if(hitList_.size() > 0) {
+                std::vector<QCore> qcores = getOrganizedQCores();
+
+		bool is_new_col = true;
+
+                for(auto& qcore : qcores) {
+                	std::vector<bool> qcore_code = qcore.encodeQCore(is_new_col);
+			code.insert(code.end(), qcore_code.begin(), qcore_code.end());
+			
+			is_new_col = qcore.islast();
+                }
+        }
+
+        return code;
 }
 
 //Returns the position (row,col) of the 4x4 QCore that contains a given hit
@@ -34,7 +79,7 @@ QCore ReadoutChip::getQCoreFromHit(Hit pixel) {
 
         std::pair<int,int> pos = getQCorePos(pixel);
 
-        for(const auto& hit:hitList) {
+        for(const auto& hit : hitList_) {
                 if(getQCorePos(hit) == pos) {
                         int i = (4 * (hit.row() % 4) + (hit.col() % 4) + 8) % 16;
                         adcs[i] = hit.adc();
@@ -47,7 +92,7 @@ QCore ReadoutChip::getQCoreFromHit(Hit pixel) {
 }
 
 //Returns a list of the qcores with hits arranged by increasing column then row numbers
-std::vector<QCore> ReadoutChip::organize_QCores(std::vector<QCore> qcores) {
+std::vector<QCore> ReadoutChip::organizeQCores(std::vector<QCore> qcores) {
         std::vector<QCore> organized_list = {};
 
         while(qcores.size() > 0) {
@@ -69,7 +114,7 @@ std::vector<QCore> ReadoutChip::organize_QCores(std::vector<QCore> qcores) {
 }
 
 //Takes in an oranized list of qcores and sets the islast and isneighbor properties of those qcores
-std::vector<QCore> link_QCores(std::vector<QCore> qcores) {
+std::vector<QCore> ReadoutChip::linkQCores(std::vector<QCore> qcores) {
   std::cout << "In link_QCores size " << qcores.size() << std::endl;
 	for(size_t i = 1; i < qcores.size(); i++) {
 		if(qcores[i].qcrow() == qcores[i - 1].qcrow()) {
@@ -97,49 +142,4 @@ std::vector<QCore> link_QCores(std::vector<QCore> qcores) {
 	std::cout << "Here003" << std::endl;
 
 	return qcores;
-}
-
-//Takes in list of hits and organizes them into the 4x4 QCores that contains them
-std::vector<QCore> ReadoutChip::getOrganizedQCores() {
-  std::cout << "In getOrganizedQCores" <<std::endl;
-        std::vector<QCore> qcores = {};
-	bool qcore_already_exists;
-	std::pair<int,int> qcore_pos;
-
-        for(const auto& hit:hitList) {
-		qcore_already_exists = false;
-		qcore_pos = getQCorePos(hit);
-
-		for(size_t i = 0; i < qcores.size(); i++) {
-			if(qcores[i].qcrow() == qcore_pos.first && qcores[i].ccol() == qcore_pos.second) {
-				qcore_already_exists = true;
-			}
-		}
-
-		if(!qcore_already_exists) {
-                	qcores.push_back(getQCoreFromHit(hit));
-		}
-        }
-
-        return link_QCores(organize_QCores(qcores));
-}
-
-//Returns the encoding of the readout chip
-std::vector<bool> ReadoutChip::getChipCode() {
-        std::vector<bool> code = {};
-
-        if(hitList.size() > 0) {
-                std::vector<QCore> qcores = getOrganizedQCores();
-
-		bool is_new_col = true;
-
-                for(auto& qcore:qcores) {
-                	std::vector<bool> qcore_code = qcore.encodeQCore(is_new_col);
-			code.insert(code.end(), qcore_code.begin(), qcore_code.end());
-			
-			is_new_col = qcore.islast();
-                }
-        }
-
-        return code;
 }

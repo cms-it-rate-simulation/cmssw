@@ -1,5 +1,5 @@
-#ifndef READOUTCHIP_H
-#define READOUTCHIP_H
+#ifndef DataFormats_Phase2TrackerDigi_ReadoutChip_h
+#define DataFormats_Phase2TrackerDigi_ReadoutChip_h
 
 #include <vector>
 #include <utility>
@@ -8,11 +8,9 @@
 #include "Hit.h"
 
 class ReadoutChip {
-	std::vector<Hit> hitList;
-	int rocnum_;
 
 public:
-	ReadoutChip(int rocnum, std::vector<Hit> hl);
+	ReadoutChip(int rocnum, std::vector<Hit> hitList);
 
 	//Returns the number of hits on the readout chip
 	unsigned int size();
@@ -26,11 +24,16 @@ public:
 	std::vector<bool> getChipCode();
 
 private:
+	std::vector<Hit> hitList_;
+	int rocnum_;
+
 	std::pair<int,int> getQCorePos(Hit hit);
 
 	QCore getQCoreFromHit(Hit pixel);
 
-	std::vector<QCore> organize_QCores(std::vector<QCore> qcores);
+	std::vector<QCore> organizeQCores(std::vector<QCore> qcores);
+
+	std::vector<QCore> linkQCores(std::vector<QCore> qcores);
 };
 
 #endif
