@@ -42,7 +42,7 @@ std::vector<QCore> ReadoutChip::getOrganizedQCores() {
 }
 
 //Returns the encoding of the readout chip
-std::vector<bool> ReadoutChip::getChipCode(int event) {
+std::vector<bool> ReadoutChip::getChipCode(int event, bool aurora) {
         std::vector<bool> code = intToBinary(event, 8);
 
         if(hitList_.size() > 0) {
@@ -57,6 +57,10 @@ std::vector<bool> ReadoutChip::getChipCode(int event) {
 			is_new_col = qcore.islast();
                 }
         }
+
+	if(aurora) {
+		auroraFormat(code);
+	}
 
         return code;
 }
@@ -164,4 +168,16 @@ std::vector<bool> ReadoutChip::intToBinary(int num, int length) {
 	}
 
 	return bi_num;
+}
+
+//Takes in an unformatted encoding and adds aurora formatting to it
+void ReadoutChip::auroraFormat(std::vector<bool>& code) {
+	addOrphanBits(code);
+}
+
+//Takes in an encoding and makes its length equal to the nearest multiple of 64
+//above its current length by adding 0's to the end of the code
+void ReadoutChip::addOrphanBits(std::vector<bool>& code) {
+	std::vector<bool> orphanBits(code.size() % 64, 0);
+	code.insert(code.end(), orphanBits.begin(), orphanBits.end());
 }
