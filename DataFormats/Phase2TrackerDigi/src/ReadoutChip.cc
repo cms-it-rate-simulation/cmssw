@@ -51,7 +51,7 @@ QCore ReadoutChip::getQCoreFromHit(Hit pixel) {
 
 
 //Removes duplicates from the given list of qcores
-std::vector<QCore> ReadoutChip::rem_duplicates(std::vector<QCore> qcores) {
+std::vector<QCore> ReadoutChip::remDuplicates(std::vector<QCore> qcores) {
         std::vector<QCore> list = {};
 
         while(qcores.size() > 0) {
@@ -128,18 +128,18 @@ std::vector<QCore> ReadoutChip::getOrganizedQCores() {
   std::cout << "In getOrganizedQCores" <<std::endl;
         std::vector<QCore> qcores = {};
 
-        for(const auto& hit:hitList) {
-                qcores.push_back(get_QCore_from_hit(hit));
+        for(const auto& hit:hitList_) {
+                qcores.push_back(getQCoreFromHit(hit));
         }
 
-        return link_QCores(organize_QCores(rem_duplicates(qcores)));
+        return linkQCores(organizeQCores(remDuplicates(qcores)));
 }
 
 //Returns the encoding of the readout chip
-std::vector<bool> ReadoutChip::get_chip_code() {
+std::vector<bool> ReadoutChip::getChipCode() {
         std::vector<bool> code = {};
 
-        if(hitList.size() > 0) {
+        if(hitList_.size() > 0) {
                 std::vector<QCore> qcores = getOrganizedQCores();
 
 		bool is_new_col = true;

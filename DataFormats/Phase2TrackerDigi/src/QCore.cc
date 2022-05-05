@@ -26,7 +26,7 @@ QCore::QCore(int rocid, int ccol, int qcrow, bool isneighbour, bool islast, std:
   qcrow_ = qcrow;
   isneighbour_ = isneighbour;
   islast_ = islast;
-  adcs_ = adcs;
+  adcs = adcs;
 }
 
 //Returns the hitmap for the QCore in the 4x4 sensor coordinates
@@ -36,7 +36,7 @@ std::vector<bool> QCore::getHitmap() {
 	std::vector<bool> hitmap = {};
 
     	//hitmap.reserve(16);
-    	for(auto adc : adcs_) {
+    	for(auto adc : adcs) {
         	hitmap.push_back(adc > 0);
     	}
 	//assert(hitmap.size()==16);
@@ -64,7 +64,7 @@ std::vector<bool> QCore::encodeQCore(bool is_new_col) {
 	std::vector<bool> hitmap_code = getHitmapCode(getHitmap());
 	code.insert(code.end(), hitmap_code.begin(), hitmap_code.end());
 
-	for(auto adc : adcs_) {
+	for(auto adc : adcs) {
 		if(adc != 0) {
 			std::vector<bool> adc_code = intToBinary(adc, 4);
 			code.insert(code.end(), adc_code.begin(), adc_code.end());
@@ -73,11 +73,11 @@ std::vector<bool> QCore::encodeQCore(bool is_new_col) {
 
 	return code;	
 
-  ccol_ = ccol_in;
-  qcrow_ = qcrow_in;
-  isneighbour_ = isneighbour_in;
-  islast_ = islast_in;
-  adcs = adcs_in;
+  ccol_ = ccol_;
+  qcrow_ = qcrow_;
+  isneighbour_ = isneighbour_;
+  islast_ = islast_;
+  adcs = adcs;
 
 }
 
@@ -107,7 +107,7 @@ std::vector<bool> QCore::toRocCoordinates(std::vector<bool>& hitmap) {
 	return ROC_hitmap;
 }
 
-
+/*
 //Returns the hitmap for the QCore in the 4x4 sensor coordinates
 std::vector<bool> QCore::getHitmap() {
     	//assert(adcs.size()==16);
@@ -120,8 +120,7 @@ std::vector<bool> QCore::getHitmap() {
     	}
 	//assert(hitmap.size()==16);
 
-    	return toRocCoordinates(hitmap);
-}
+	*/ 
 
 
 //Converts an integer into binary, and formats it with the given length
@@ -191,7 +190,7 @@ std::vector<bool> QCore::getHitmapCode(std::vector<bool> hitmap) {
         } return code;
 }
 
-
+/*
 //Returns the bit code associated with the QCore
 std::vector<bool> QCore::encodeQCore(bool is_new_col) {
 	std::vector<bool> code = {};
@@ -220,5 +219,5 @@ std::vector<bool> QCore::encodeQCore(bool is_new_col) {
 	}
 
 	return code;	
-}
+	}*/
 

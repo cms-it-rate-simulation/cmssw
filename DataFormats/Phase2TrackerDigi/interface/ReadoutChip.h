@@ -31,6 +31,10 @@ private:
 
 	QCore getQCoreFromHit(Hit pixel);
 
+	//std::vector<bool> getChipCode();
+
+	std::vector<QCore> remDuplicates(std::vector<QCore> qcores);
+
 	std::vector<QCore> organizeQCores(std::vector<QCore> qcores);
 
 	std::vector<QCore> linkQCores(std::vector<QCore> qcores);

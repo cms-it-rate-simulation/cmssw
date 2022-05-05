@@ -3,15 +3,15 @@
 #include<vector>
 
 class QCore{
-
+  /*
  private:
-  std::vector<int> adcs;
+  std::vector<int> adcs_;
   bool islast_;
   bool isneighbour_;
   int rocid_;
   int ccol_;
   int qcrow_;
-
+  */
  public:
   QCore(
 	int rocid,
@@ -52,6 +52,10 @@ class QCore{
     return ccol_;
   }
   
+  std::vector<int> adcVector() const{
+    return adcs;
+  }
+
   //Returns the row number of the QCore
   int qcrow() const {
     return qcrow_;
@@ -72,7 +76,7 @@ class QCore{
 
  private:
 
-  std::vector<int> adcs_;
+  std::vector<int> adcs;
   bool islast_;
   bool isneighbour_;
   int rocid_;
