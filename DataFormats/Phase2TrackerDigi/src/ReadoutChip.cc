@@ -178,6 +178,10 @@ void ReadoutChip::auroraFormat(std::vector<bool>& code) {
 //Takes in an encoding and makes its length equal to the nearest multiple of 64
 //above its current length by adding 0's to the end of the code
 void ReadoutChip::addOrphanBits(std::vector<bool>& code) {
-	std::vector<bool> orphanBits(code.size() % 64, 0);
-	code.insert(code.end(), orphanBits.begin(), orphanBits.end());
+	//std::vector<bool> orphanBits(code.size() % 64, 0);
+	//code.insert(code.end(), orphanBits.begin(), orphanBits.end());
+	
+	while(code.size() % 64 != 0) {
+		code.push_back(0);
+	}
 }
