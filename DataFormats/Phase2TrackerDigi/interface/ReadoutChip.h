@@ -26,6 +26,7 @@ public:
 private:
 	std::vector<Hit> hitList_;
 	int rocnum_;
+	static bool endOfStreamMarker;
 
 	std::pair<int,int> getQCorePos(Hit hit);
 

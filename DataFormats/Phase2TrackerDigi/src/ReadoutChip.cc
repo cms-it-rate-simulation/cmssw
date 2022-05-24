@@ -7,6 +7,8 @@
 #include "../interface/ReadoutChip.h"
 #include "../interface/Hit.h"
 
+bool ReadoutChip::endOfStreamMarker = true;
+
 ReadoutChip::ReadoutChip(int rocnum, std::vector<Hit> hitList) {
   hitList_ = hitList;
   rocnum_ = rocnum; 
@@ -178,10 +180,16 @@ void ReadoutChip::auroraFormat(std::vector<bool>& code) {
 //Takes in an encoding and makes its length equal to the nearest multiple of 64
 //above its current length by adding 0's to the end of the code
 void ReadoutChip::addOrphanBits(std::vector<bool>& code) {
-	//std::vector<bool> orphanBits(code.size() % 64, 0);
-	//code.insert(code.end(), orphanBits.begin(), orphanBits.end());
-	
+	int trailingZeros = 0;
+
 	while(code.size() % 64 != 0) {
 		code.push_back(0);
+		trailingZeros++;
+	}
+
+	if(endOfStreamMarker && trailingZeros < 6) {
+		for(int i = 0; i < 64; i++) {
+			code.push_back(0);
+		}
 	}
 }
