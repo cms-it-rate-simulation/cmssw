@@ -175,6 +175,7 @@ std::vector<bool> ReadoutChip::intToBinary(int num, int length) {
 //Takes in an unformatted encoding and adds aurora formatting to it
 void ReadoutChip::auroraFormat(std::vector<bool>& code) {
 	addOrphanBits(code);
+	addAuroraTags(code);
 }
 
 //Takes in an encoding and makes its length equal to the nearest multiple of 64
@@ -191,5 +192,12 @@ void ReadoutChip::addOrphanBits(std::vector<bool>& code) {
 		for(int i = 0; i < 64; i++) {
 			code.push_back(0);
 		}
+	}
+}
+
+//Takes in a code that has had orphan bits added and adds the aurora tag 01 in front of each 64 bit block
+void ReadoutChip::addAuroraTags(std::vector<bool>& code) {
+	for(size_t i = 0; i < code.size(); i += 66) {
+		code.insert(code.begin() + i, {0,1});
 	}
 }
