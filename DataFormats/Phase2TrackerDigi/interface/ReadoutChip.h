@@ -40,6 +40,8 @@ private:
 
 	void auroraFormat(std::vector<bool>& code);
 
+	void addEndStreamBits(std::vector<bool>& code);
+
 	void addOrphanBits(std::vector<bool>& code);
 
 	void addAuroraTags(std::vector<bool>& code);
