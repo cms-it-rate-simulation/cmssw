@@ -238,7 +238,7 @@ std::vector<ReadoutChip> splitByChip(std::vector<Hit> hitList) {
         return {ReadoutChip(0,chip1), ReadoutChip(1, chip2), ReadoutChip(2, invertHits(chip3)),ReadoutChip(3, invertHits(chip4))};
 }
 
-std::vector<ReadoutChip> processHits(std::vector<Hit> hitList) {
+std::vector<ReadoutChip> processHits(std::vector<Hit> hitList, int event, bool auroraFormat) {
         std::vector<Hit> newHitList;
 
         std::cout << "Hits:" << "\n";
@@ -253,7 +253,7 @@ std::vector<ReadoutChip> processHits(std::vector<Hit> hitList) {
 
         for(size_t i = 0; i < chips.size(); i++) {
                 ReadoutChip chip = chips[i];
-                code = chip.getChipCode();
+                code = chip.getChipCode(event, auroraFormat);
 
                 std::cout << "number of hits: " << chip.size() << "\n";
                 std::cout << "code length: " << code.size() << "\n";
@@ -300,6 +300,10 @@ void PixelQCoreProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
 
     edm::DetSet<PixelDigi> theDigis = (*pixelDigiHandle)[ tkId ];
 
+    int eventNum = 1;
+
+    bool auroraFormat = true;
+
 
 
     //break;
@@ -330,7 +334,7 @@ void PixelQCoreProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
       hitlist.emplace_back(Hit(iterDigi->row(),iterDigi->column(),iterDigi->adc()));
     }
 
-    std::vector<ReadoutChip> chips = processHits(hitlist);
+    std::vector<ReadoutChip> chips = processHits(hitlist, eventNum, auroraFormat);
 
     std::cout << "Make DetSet" << std::endl;
 
@@ -354,7 +358,7 @@ void PixelQCoreProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
 	DetSetQCores.push_back(qcore);
       }
 
-      ROCBitStream aROCBitStream(i,chip.getChipCode());
+      ROCBitStream aROCBitStream(i,chip.getChipCode(eventNum, auroraFormat));
 
       DetSetBitStream.push_back(aROCBitStream);
 

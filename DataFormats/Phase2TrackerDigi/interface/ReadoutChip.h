@@ -21,11 +21,12 @@ public:
 
 	std::vector<QCore> getOrganizedQCores();
 
-	std::vector<bool> getChipCode();
+	std::vector<bool> getChipCode(int event, bool aurora);
 
 private:
 	std::vector<Hit> hitList_;
 	int rocnum_;
+	static bool endOfStreamMarker;
 
 	std::pair<int,int> getQCorePos(Hit hit);
 
@@ -34,6 +35,16 @@ private:
 	std::vector<QCore> organizeQCores(std::vector<QCore> qcores);
 
 	std::vector<QCore> linkQCores(std::vector<QCore> qcores);
+  
+	std::vector<bool> intToBinary(int num, int length);
+
+	void auroraFormat(std::vector<bool>& code);
+
+	void addEndStreamBits(std::vector<bool>& code);
+
+	void addOrphanBits(std::vector<bool>& code);
+
+	void addAuroraTags(std::vector<bool>& code);
 };
 
 #endif

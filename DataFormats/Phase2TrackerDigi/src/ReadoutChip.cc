@@ -1,3 +1,4 @@
+#include <cmath>
 #include <vector>
 #include <utility>
 #include <string>
@@ -5,6 +6,8 @@
 #include "../interface/QCore.h"
 #include "../interface/ReadoutChip.h"
 #include "../interface/Hit.h"
+
+bool ReadoutChip::endOfStreamMarker = true;
 
 ReadoutChip::ReadoutChip(int rocnum, std::vector<Hit> hitList) {
   hitList_ = hitList;
@@ -41,8 +44,8 @@ std::vector<QCore> ReadoutChip::getOrganizedQCores() {
 }
 
 //Returns the encoding of the readout chip
-std::vector<bool> ReadoutChip::getChipCode() {
-        std::vector<bool> code = {};
+std::vector<bool> ReadoutChip::getChipCode(int event, bool aurora) {
+        std::vector<bool> code = intToBinary(event, 8);
 
         if(hitList_.size() > 0) {
                 std::vector<QCore> qcores = getOrganizedQCores();
@@ -56,6 +59,10 @@ std::vector<bool> ReadoutChip::getChipCode() {
 			is_new_col = qcore.islast();
                 }
         }
+
+	if(aurora) {
+		auroraFormat(code);
+	}
 
         return code;
 }
@@ -142,4 +149,68 @@ std::vector<QCore> ReadoutChip::linkQCores(std::vector<QCore> qcores) {
 	std::cout << "Here003" << std::endl;
 
 	return qcores;
+}
+
+//Converts an integer into binary, and formats it with the given length
+std::vector<bool> ReadoutChip::intToBinary(int num, int length) {
+	int n = num;
+	std::vector<bool> bi_num = {};
+	
+	for(int i = 0; i < length; i++) {
+		bi_num.push_back(0);
+	}
+
+	for(int i = length; i > 0; i--) {
+		if(n >= pow(2, i - 1)) {
+			bi_num[length - i] = 1;
+			n -= pow(2,i - 1);
+		} else {
+			bi_num[length - i] = 0;
+		}
+	}
+
+	return bi_num;
+}
+
+//Takes in an unformatted encoding and adds aurora formatting to it
+void ReadoutChip::auroraFormat(std::vector<bool>& code) {
+	addEndStreamBits(code);
+	addOrphanBits(code);
+	addAuroraTags(code);
+}
+
+//Takes in a code that is to be aurora formatted and adds a 1 at the beginning of
+//the last 64-bit block and a 0 at the beginning of each previous 64-bit block
+void ReadoutChip::addEndStreamBits(std::vector<bool>& code) {
+	for(size_t i = 0; i < code.size(); i += 64) {
+		if(code.size() - i < 64) {
+			code.insert(code.begin() + i, 1);
+		} else {
+			code.insert(code.begin() + i, 0);
+		}
+	}
+}
+
+//Takes in an encoding and makes its length equal to the nearest multiple of 64
+//above its current length by adding 0's to the end of the code
+void ReadoutChip::addOrphanBits(std::vector<bool>& code) {
+	int trailingZeros = 0;
+
+	while(code.size() % 64 != 0) {
+		code.push_back(0);
+		trailingZeros++;
+	}
+
+	if(endOfStreamMarker && trailingZeros < 6) {
+		for(int i = 0; i < 64; i++) {
+			code.push_back(0);
+		}
+	}
+}
+
+//Takes in a code that has had orphan bits added and adds the aurora tag 01 in front of each 64 bit block
+void ReadoutChip::addAuroraTags(std::vector<bool>& code) {
+	for(size_t i = 0; i < code.size(); i += 66) {
+		code.insert(code.begin() + i, {0,1});
+	}
 }
